@@ -1,9 +1,10 @@
 # stockupdater
 Update the stock from a flat file with numerics in an Excel sheet
 
+Install Java [JDK8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) minimum.
+
+Use [maven](http://maven.apache.org/download.cgi) to compile, package or launch the project.
+
 Example to launch the tests:
 
-$ java -Dexcel.file=src/test/resources/articles.xls \
-       -Dstock.file=src/test/resources/stock.txt \
-       -Dupdate.type=UPDATE \
-       -jar stockupdater-xxx.jar
+`$ mvn exec:java -Dstock.file=src/test/resources/stock.txt -Dexcel.file=src/test/resources/articles.xls -Dupdate.type=UPDATE`
