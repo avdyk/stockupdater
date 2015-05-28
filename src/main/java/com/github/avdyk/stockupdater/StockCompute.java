@@ -1,7 +1,6 @@
 package com.github.avdyk.stockupdater;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Contient le stock du fichier des codes barres.
@@ -16,5 +15,5 @@ public interface StockCompute {
    *
    * @return un stream des entrées codeBarre et stock.
    */
-  Stream<Map.Entry<Long, Long>> stockStream();
+  Map<Long, Long> stockStream();
 }

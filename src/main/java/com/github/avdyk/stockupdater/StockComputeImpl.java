@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +27,6 @@ public class StockComputeImpl implements StockCompute {
 		final Stream<String> lines = Files.lines(stockFile);
     // liste les lignes de nombres comme clés d'une 'map'; les valeurs sont le nombre d'occurences
 		stockMap = lines.filter(NumberUtils::isNumber)
-        .sorted()
         .collect(
             Collectors.groupingBy(Long::parseLong, Collectors.counting())
         );
@@ -37,8 +37,8 @@ public class StockComputeImpl implements StockCompute {
   }
 
   @Override
-  public Stream<Map.Entry<Long, Long>> stockStream() {
-    return stockMap.entrySet().stream();
+  public Map<Long, Long> stockStream() {
+    return new HashMap<>(stockMap);
   }
 
 }

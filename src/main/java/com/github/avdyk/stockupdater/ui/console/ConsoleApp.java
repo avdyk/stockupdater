@@ -8,7 +8,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class ConsoleApp {
 
@@ -18,8 +17,8 @@ public class ConsoleApp {
 		LOG.info("Application Stock Updater start");
 		final ApplicationContext ctx = new AnnotationConfigApplicationContext(ConfImpl.class);
 		final StockCompute stockCompute = ctx.getBean(StockCompute.class);
-    final Stream<Map.Entry<Long, Long>> stock = stockCompute.stockStream();
-    stock.forEach(e -> LOG.info("code: {}; stock: {}", e.getKey(), e.getValue()));
+    final Map<Long, Long> stock = stockCompute.stockStream();
+    stock.forEach((k, v) -> LOG.info("code: {}; stock: {}", k, v));
 		// -- la suite
 		LOG.info("Application Stock Updater stop");
 	}
