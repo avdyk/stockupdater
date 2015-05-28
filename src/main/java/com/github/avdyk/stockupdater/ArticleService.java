@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -31,14 +32,16 @@ public class ArticleService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
 
-  @Value("#{confImpl.excelFile")
-  Path excelFile;
+  final Path excelFile;
+  final String sheetName;
+  final String out;
+  final String[] in;
 
-  public void updateStock(final UpdateType updateType,
-                          final Map<Long,Long> stock,
-                          final String sheetName,
-                          final String out,
-                          final String... in) throws IOException {
+  @Autowired
+  public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile,
+                        @Value("#{confImpl.sheetName}") final String sheetName,
+                        @Value("#{confImpl.out}") final String out,
+                        @Value("#{confImpl.in}") final String...in) throws IOException {
     // pre-requis:
     if (StringUtils.isBlank(out)) {
       throw new IllegalArgumentException("Unknown 'out' column to update the stock");
@@ -51,12 +54,10 @@ public class ArticleService {
         throw new IllegalArgumentException("Illegal value for one of the 'in' column");
       }
     }
-    if (stock == null) {
-      throw new NullPointerException("Stock cannot be 'null'");
-    }
-    if (updateType == null) {
-      throw new NullPointerException("Update Type cannot be 'null'");
-    }
+    this.excelFile = excelFile;
+    this.sheetName = sheetName;
+    this.out = out;
+    this.in = in;
     final XSSFWorkbook workbook = new XSSFWorkbook(Files.newInputStream(excelFile));
     if (LOG.isDebugEnabled()) {
       final int sheets = workbook.getNumberOfSheets();
@@ -79,6 +80,16 @@ public class ArticleService {
       final Row header = rowIter.next();
       final Iterator<Cell> cellIter = header.iterator();
       // TODO parcourir les colonnes pour trouver la out et toutes les in
+    }
+  }
+
+  public void updateStock(final UpdateType updateType,
+                          final Map<Long,Long> stock) {
+    if (stock == null) {
+      throw new NullPointerException("Stock cannot be 'null'");
+    }
+    if (updateType == null) {
+      throw new NullPointerException("Update Type cannot be 'null'");
     }
   }
 }
