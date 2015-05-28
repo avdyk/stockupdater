@@ -19,22 +19,38 @@ import java.nio.file.Paths;
 public class ConfImpl {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ConfImpl.class);
+  public static final String EXCEL_FILE = "excel.file";
+  public static final String EXCEL_SHEETNAME = "excel.sheetname";
+  public static final String EXCEL_OUT_COLUMN_NAME = "excel.out";
+  public static final String EXCEL_IN_COLUMN_NAMES = "excel.in";
+  public static final String STOCK_FILE = "stock.file";
+  public static final String UPDATE_TYPE = "update.type";
 
-	@Autowired
+  @Autowired
 	private Environment env;
   private Path excelFile;
   private Path stockFile;
   private UpdateType updateType;
+  private String sheetName;
+  private String out;
+  private String[] in;
 
   @PostConstruct
   void postConstruct() {
-    final String exFstr = env.getProperty("excel.file");
+    final String exFstr = env.getProperty(EXCEL_FILE);
     excelFile = Paths.get(exFstr);
-    LOG.debug("Fichier Excel: {}", excelFile);
-    final String stFstr = env.getProperty("stock.file");
+    LOG.debug("Excel filename: {}", excelFile);
+    sheetName = env.getProperty(EXCEL_SHEETNAME);
+    LOG.debug("Excel sheetname: {}", sheetName);
+    out = env.getProperty(EXCEL_OUT_COLUMN_NAME);
+    LOG.debug("Excel out column name: {}", out);
+    final String instr = env.getProperty(EXCEL_IN_COLUMN_NAMES);
+    in = instr.split(",");
+    LOG.debug("Excel in column names: {}", in);
+    final String stFstr = env.getProperty(STOCK_FILE);
     stockFile = Paths.get(stFstr);
-    LOG.debug("Fichier stock: {}", stockFile);
-    final String upTstr = env.getProperty("update.type");
+    LOG.debug("Stock filename: {}", stockFile);
+    final String upTstr = env.getProperty(UPDATE_TYPE);
     updateType = UpdateType.valueOf(upTstr);
     LOG.debug("Update type: {}", updateType);
   }
@@ -51,7 +67,19 @@ public class ConfImpl {
 		return updateType;
 	}
 
-	/**
+  public String getSheetName() {
+    return sheetName;
+  }
+
+  public String getOut() {
+    return out;
+  }
+
+  public String[] getIn() {
+    return in;
+  }
+
+  /**
 	 * To resolve ${} in @Value.
 	 *
 	 * @return a property sources place holder configurer for Spring.
