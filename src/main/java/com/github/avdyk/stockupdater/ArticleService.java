@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Update the database with the StockCompute.
@@ -34,7 +35,7 @@ public class ArticleService {
   Path excelFile;
 
   public void updateStock(final UpdateType updateType,
-                          final StockCompute stock,
+                          final Map<Long,Long> stock,
                           final String sheetName,
                           final String out,
                           final String... in) throws IOException {

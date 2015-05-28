@@ -7,17 +7,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 public class ConsoleApp {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ConsoleApp.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		LOG.info("Application Stock Updater start");
 		final ApplicationContext ctx = new AnnotationConfigApplicationContext(ConfImpl.class);
-		final StockCompute stockCompute = ctx.getBean(StockCompute.class);
-    final Map<Long, Long> stock = stockCompute.stockStream();
+    final ConfImpl conf = ctx.getBean(ConfImpl.class);
+    final StockCompute stockCompute = ctx.getBean(StockCompute.class);
+    final Map<Long, Long> stock = stockCompute.stockStream(Files.lines(conf.getStockFile()));
     stock.forEach((k, v) -> LOG.info("code: {}; stock: {}", k, v));
 		// -- la suite
 		LOG.info("Application Stock Updater stop");
