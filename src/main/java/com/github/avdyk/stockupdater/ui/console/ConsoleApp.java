@@ -1,5 +1,6 @@
 package com.github.avdyk.stockupdater.ui.console;
 
+import com.github.avdyk.stockupdater.ArticleService;
 import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import org.slf4j.Logger;
@@ -22,7 +23,9 @@ public class ConsoleApp {
     final StockCompute stockCompute = ctx.getBean(StockCompute.class);
     final Map<Long, Long> stock = stockCompute.stockStream(Files.lines(conf.getStockFile()));
     stock.forEach((k, v) -> LOG.info("code: {}; stock: {}", k, v));
-		// -- la suite
+    final ArticleService articleService = ctx.getBean(ArticleService.class);
+    articleService.updateStock(conf.getUpdateType(), stock);
+    // -- la suite
 		LOG.info("Application Stock Updater stop");
 	}
 
