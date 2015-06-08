@@ -15,11 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Update the database with the StockCompute.
@@ -31,92 +27,133 @@ import java.util.Map;
 @Scope("prototype")
 public class ArticleService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
 
-  Path excelFile;
-  String sheetName;
-  String out;
-  List<String> in;
-  int outIndex;
-  List<Integer> intIndexes = new ArrayList<>();
+    XSSFWorkbook excelWorkbook;
+    List<String> sheetNames;
+    XSSFSheet selectedSheet;
+    List<String> columnNames;
 
-  @Autowired
-  public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile,
-                        @Value("#{confImpl.sheetName}") final String sheetName,
-                        @Value("#{confImpl.out}") final String out,
-                        @Value("#{confImpl.in}") final String...in) throws IOException {
-    // pre-requis:
-    if (StringUtils.isBlank(out)) {
-      throw new IllegalArgumentException("Unknown 'out' column to update the stock");
+    String out;
+    List<String> in;
+
+    @Autowired
+    public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile) throws IOException {
+        this(new XSSFWorkbook(Files.newInputStream(excelFile)));
     }
-    if (in == null || in.length == 0) {
-      throw new IllegalArgumentException("Must have at least one 'in' column to lookup the barcode");
-    }
-    for (String i : in) {
-      if (StringUtils.isBlank(i)) {
-        throw new IllegalArgumentException("Illegal value for one of the 'in' column");
-      }
-    }
-    this.excelFile = excelFile;
-    this.sheetName = sheetName;
-    this.out = out;
-    this.in = Arrays.asList(in);
-    final XSSFWorkbook workbook = new XSSFWorkbook(Files.newInputStream(excelFile));
-    if (LOG.isDebugEnabled()) {
-      final int sheets = workbook.getNumberOfSheets();
-      for (int i = 0; i < sheets; i++) {
-        LOG.debug("Sheet {}: {}", i, workbook.getSheetName(i));
-      }
-    }
-    final XSSFSheet sheet;
-    if (sheetName != null) {
-      sheet = workbook.getSheet(sheetName);
-      LOG.debug("Reading sheet {}", sheetName);
-    } else {
-      sheet = workbook.getSheetAt(0);
-      LOG.debug("No sheet name, picking the first one");
-    }
-    int outIndexTemp = -1;
-    final Iterator<Row> rowIter = sheet.rowIterator();
-    if (rowIter != null && rowIter.hasNext()) {
-      final Row header = rowIter.next();
-      // parcourir les colonnes pour trouver la out
-      final Iterator<Cell> cellIterator = header.iterator();
-      while (outIndexTemp == -1 && cellIterator.hasNext()) {
-        final Cell c = cellIterator.next();
-        outIndexTemp = out.equals(c.getStringCellValue()) ? c.getColumnIndex() : -1;
-      }
-      if (outIndexTemp == -1) {
-        // TODO try to add new column instead of throwing an exception
-        throw new IllegalArgumentException("out column not found");
-      }
-      outIndex = outIndexTemp;
-      // parcourir les colonnes pour trouver la out et toutes les in
-      final List<String> inTemp = new ArrayList<>(this.in);
-      for (final Cell cell : header) {
-        final String cellName = cell.getStringCellValue();
-        final int cellIndex = cell.getColumnIndex();
-        if (inTemp.contains(cellName)) {
-          this.intIndexes.add(cellIndex);
-          inTemp.remove(cellName);
+
+    @Autowired
+    public ArticleService(final XSSFWorkbook workbook) {
+        this.excelWorkbook = workbook;
+        final int numberOfSheets = this.excelWorkbook.getNumberOfSheets();
+        final List<String> names = new ArrayList<>(numberOfSheets);
+        for (int i = 0; i < numberOfSheets; i++) {
+            names.add(this.excelWorkbook.getSheetName(i));
         }
-      }
-      if (!inTemp.isEmpty()) {
-        for (final String i : inTemp) {
-          LOG.warn("Column {} has not been found", i);
-        }
-      }
+        this.sheetNames = Collections.unmodifiableList(names);
     }
-  }
 
-  public void updateStock(final UpdateType updateType,
-                          final Map<Long,Long> stock) {
-    if (stock == null) {
-      throw new NullPointerException("Stock cannot be 'null'");
+    @Autowired
+    public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile,
+                          @Value("#{confImpl.sheetName}") final String sheetName,
+                          @Value("#{confImpl.out}") final String out,
+                          @Value("#{confImpl.in}") final String... in) throws IOException {
+        this(excelFile);
+        // pre-requis:
+        this._setOut(out);
+        this._setIn(Arrays.asList(in));
+        if (LOG.isDebugEnabled()) {
+            final int sheets = excelWorkbook.getNumberOfSheets();
+            for (int i = 0; i < sheets; i++) {
+                LOG.debug("Sheet {}: {}", i, excelWorkbook.getSheetName(i));
+            }
+        }
+        if (sheetName != null) {
+            this.setSelectedSheet(sheetName);
+            LOG.debug("Reading sheet {}", sheetName);
+        } else {
+            this.setSelectedSheet(excelWorkbook.getSheetAt(0).getSheetName());
+            LOG.debug("No sheet name, picking the first one");
+        }
     }
-    if (updateType == null) {
-      throw new NullPointerException("Update Type cannot be 'null'");
+
+    public List<String> getSheetNames() {
+        return new ArrayList<>(this.sheetNames);
     }
-    LOG.info("Updating stock");
-  }
+
+    public void setSelectedSheet(final String selectedSheetName) {
+        this.selectedSheet = this.excelWorkbook.getSheet(selectedSheetName);
+        if (this.selectedSheet != null) {
+            int outIndexTemp = -1;
+            final Iterator<Row> rowIter = this.selectedSheet.rowIterator();
+            if (rowIter != null && rowIter.hasNext()) {
+                final Row header = rowIter.next();
+                // parcourir les colonnes pour trouver la out
+                final Iterator<Cell> cellIterator = header.iterator();
+                final List<String> columnNames = new ArrayList<>();
+                while (cellIterator.hasNext()) {
+                    final Cell c = cellIterator.next();
+                    columnNames.add(c.getStringCellValue());
+                }
+                this.columnNames = Collections.unmodifiableList(columnNames);
+            }
+        } else {
+            throw new IllegalArgumentException("Sheet not found");
+        }
+    }
+
+    public XSSFSheet getSelectedSheet() {
+        return this.selectedSheet;
+    }
+
+    public List<String> getColumnNames() {
+        return new ArrayList<>(this.columnNames);
+    }
+
+    public String getOut() {
+        return out;
+    }
+
+    public void setOut(final String out) {
+        this._setOut(out);
+    }
+
+    private void _setOut(final String out) {
+        if (StringUtils.isBlank(out)) {
+            throw new IllegalArgumentException("Unknown 'out' column to update the stock");
+        }
+        this.out = out;
+    }
+
+    public List<String> getIn() {
+        return new ArrayList<>(this.in);
+    }
+
+    public void setIn(final List<String> in) {
+        this._setIn(in);
+    }
+
+    public void _setIn(final List<String> in) {
+        if (in == null || in.isEmpty()) {
+            throw new IllegalArgumentException("Must have at least one 'in' column to lookup the barcode");
+        }
+        for (String i : in) {
+            if (StringUtils.isBlank(i)) {
+                throw new IllegalArgumentException("Illegal value for one of the 'in' column");
+            }
+        }
+        this.in = in;
+    }
+
+    public void updateStock(final UpdateType updateType,
+                            final Map<Long, Long> stock) {
+        if (stock == null) {
+            throw new NullPointerException("Stock cannot be 'null'");
+        }
+        if (updateType == null) {
+            throw new NullPointerException("Update Type cannot be 'null'");
+        }
+        LOG.info("Updating stock");
+    }
+
 }
