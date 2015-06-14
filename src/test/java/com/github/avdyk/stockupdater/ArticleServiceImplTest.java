@@ -115,6 +115,24 @@ public class ArticleServiceImplTest {
         Assert.assertEquals("newstock", service.getOut());
     }
 
+    @Test(expected = NullPointerException.class)
+    public void updateStockNullStockType() {
+        initArticleService();
+        service.updateStock(null, STOCK_08702);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void updateStockNullStock() {
+        initArticleService();
+        service.updateStock(UpdateType.UPDATE, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateStockEmptyStock() {
+        initArticleService();
+        service.updateStock(UpdateType.UPDATE, Collections.emptyMap());
+    }
+
     @Test
     public void stockUpdateArticleNotFound() {
         initArticleService();

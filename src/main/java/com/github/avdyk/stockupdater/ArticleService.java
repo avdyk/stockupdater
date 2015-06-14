@@ -157,6 +157,9 @@ public class ArticleService {
         if (stock == null) {
             throw new NullPointerException("Stock cannot be 'null'");
         }
+        if (stock.isEmpty()) {
+            throw new IllegalArgumentException("Stock cannot be empty");
+        }
         if (updateType == null) {
             throw new NullPointerException("Update Type cannot be 'null'");
         }
