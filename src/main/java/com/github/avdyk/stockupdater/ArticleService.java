@@ -3,6 +3,7 @@ package com.github.avdyk.stockupdater;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ public class ArticleService {
 
     String out;
     List<String> in;
+    Map<Long, Integer> INDEXES = new HashMap<>();
 
     @Autowired
     public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile) throws IOException {
@@ -124,9 +126,6 @@ public class ArticleService {
         }
         if (!this.columnNames.contains(out)) {
             throw new IllegalArgumentException(String.format("Column 'out' %s not found", out));
-            // FIXME add a new column
-            // this.selectedSheet.createRow(lastindex)
-            // set value of that column at line one
         }
         this.out = out;
     }
@@ -153,6 +152,29 @@ public class ArticleService {
             }
         }
         this.in = in;
+        // prepare index
+        INDEXES.clear();
+        final Iterator<Row> rowIterator = this.selectedSheet.rowIterator();
+        assert rowIterator.hasNext();
+        // header
+        rowIterator.next();
+        while (rowIterator.hasNext()) {
+            final Row row = rowIterator.next();
+            for (final String colIndxName : in) {
+                final Cell cell = row.getCell(columnNames.indexOf(colIndxName));
+                final String cellValue = cell.getStringCellValue();
+                if (StringUtils.isNumeric(cellValue)) {
+                    final Long id = Long.valueOf(cellValue);
+                    final Integer lineNum = cell.getRowIndex();
+                    if (INDEXES.containsKey(id)) {
+                        throw new IllegalArgumentException(String.format("id '%d' already exists", id));
+                    } else {
+                        INDEXES.put(id, lineNum);
+                    }
+                }
+            }
+        }
+
     }
 
     public void updateStock(final UpdateType updateType,
