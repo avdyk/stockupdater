@@ -122,6 +122,9 @@ public class ArticleService {
         if (StringUtils.isBlank(out)) {
             throw new IllegalArgumentException("Unknown 'out' column to update the stock");
         }
+        if (!this.columnNames.contains(out)) {
+            throw new IllegalArgumentException(String.format("Column 'out' %s not found", out));
+        }
         this.out = out;
     }
 
@@ -140,6 +143,10 @@ public class ArticleService {
         for (String i : in) {
             if (StringUtils.isBlank(i)) {
                 throw new IllegalArgumentException("Illegal value for one of the 'in' column");
+            } else {
+                if (!this.columnNames.contains(i)) {
+                    throw new IllegalArgumentException(String.format("Column 'in' %s not found", i));
+                }
             }
         }
         this.in = in;
