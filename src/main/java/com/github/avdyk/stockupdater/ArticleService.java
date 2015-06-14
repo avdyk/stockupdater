@@ -124,6 +124,9 @@ public class ArticleService {
         }
         if (!this.columnNames.contains(out)) {
             throw new IllegalArgumentException(String.format("Column 'out' %s not found", out));
+            // FIXME add a new column
+            // this.selectedSheet.createRow(lastindex)
+            // set value of that column at line one
         }
         this.out = out;
     }
