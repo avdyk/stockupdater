@@ -3,6 +3,7 @@ package com.github.avdyk.stockupdater;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -79,6 +81,10 @@ public class ArticleService {
     }
   }
 
+  public XSSFWorkbook getExcelWorkbook() {
+    return excelWorkbook;
+  }
+
   public List<String> getSheetNames() {
     return new ArrayList<>(this.sheetNames);
   }
@@ -86,7 +92,6 @@ public class ArticleService {
   public void setSelectedSheet(final String selectedSheetName) {
     this.selectedSheet = this.excelWorkbook.getSheet(selectedSheetName);
     if (this.selectedSheet != null) {
-      int outIndexTemp = -1;
       final Iterator<Row> rowIter = this.selectedSheet.rowIterator();
       if (rowIter != null && rowIter.hasNext()) {
         final Row header = rowIter.next();
@@ -211,6 +216,52 @@ public class ArticleService {
       throw new NullPointerException("Update Type cannot be 'null'");
     }
     LOG.info("Updating stock");
+    stock.forEach((id, quantity) -> {
+      if (id != null && quantity != null) {
+        final Set<Integer> rows = INDEXES.get(id);
+        if (rows != null && !rows.isEmpty()) {
+          updateStock(updateType, rows, quantity);
+        } else {
+          LOG.warn("Article {} has not been found!", id);
+        }
+      }
+    });
+  }
+
+  void updateStock(final UpdateType updateType, final Set<Integer> rows, final long quantity) {
+    assert updateType != null;
+    assert rows != null;
+    assert !rows.isEmpty();
+    final int outIndex = this.columnNames.indexOf(out);
+    rows.stream().filter(r -> r != null)
+        .forEach(row -> {
+          final XSSFRow r = selectedSheet.getRow(row);
+          XSSFCell cell = r.getCell(outIndex);
+          if (cell == null) {
+            cell = r.createCell(outIndex);
+          }
+          // TODO get original stock
+          switch (updateType) {
+            case UPDATE:
+              cell.setCellValue(quantity);
+              break;
+            case ADD:
+              LOG.warn("NOT YET IMPLEMENTED");
+              break;
+            case SUBSTRACT:
+              LOG.warn("NOT YET IMPLEMENTED");
+              break;
+          }
+        });
+  }
+
+  /**
+   * Save the sheet on the stream. The stream will not be closed!
+   * @param stream the stream.
+   * @throws IOException if a problem with the stream.
+   */
+  public void writeExcelWorkbook(final OutputStream stream) throws IOException {
+    this.excelWorkbook.write(stream);
   }
 
 }
