@@ -3,6 +3,8 @@ package com.github.avdyk.stockupdater;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -13,6 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -27,7 +30,7 @@ import java.util.*;
 @Scope("prototype")
 public class ArticleService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
 
     XSSFWorkbook excelWorkbookIn;
     XSSFWorkbook excelWorkbookOut;
@@ -108,8 +111,8 @@ public class ArticleService {
         }
     }
 
-    public List<String> getInSheetNames() {
-        return new ArrayList<>(this.inSheetNames);
+    public List<String> getSheetNames() {
+        return new ArrayList<>(this.sheetNames);
     }
 
     public void setInSelectedSheet(final String selectedSheetName) {
@@ -179,9 +182,9 @@ public class ArticleService {
         return out;
     }
 
-    public void setOut(final String out) {
-        this._setOut(out);
-    }
+  public void setOut(final String out) {
+    this._setOut(out);
+  }
 
     private void _setOut(final String out) {
         if (StringUtils.isBlank(out)) {
@@ -201,57 +204,125 @@ public class ArticleService {
         this._setIn(in);
     }
 
-    public void _setIn(final List<String> in) {
-        if (in == null || in.isEmpty()) {
-            throw new IllegalArgumentException("Must have at least one 'in' column to lookup the barcode");
+  public void _setIn(final List<String> in) {
+    if (in == null || in.isEmpty()) {
+      throw new IllegalArgumentException("Must have at least one 'in' column to lookup the barcode");
+    }
+    for (String i : in) {
+      if (StringUtils.isBlank(i)) {
+        throw new IllegalArgumentException("Illegal value for one of the 'in' column");
+      } else {
+        if (!this.inColumnNames.contains(i)) {
+          throw new IllegalArgumentException(String.format("Column 'in' %s not found", i));
         }
-        for (String i : in) {
-            if (StringUtils.isBlank(i)) {
-                throw new IllegalArgumentException("Illegal value for one of the 'in' column");
+      }
+    }
+    this.in = in;
+    // prepare index
+    INDEXES.clear();
+    final Iterator<Row> rowIterator = this.inSelectedSheet.rowIterator();
+    assert rowIterator.hasNext();
+    // header
+    rowIterator.next();
+    while (rowIterator.hasNext()) {
+      final Row row = rowIterator.next();
+      for (final String colIndxName : in) {
+        final Cell cell = row.getCell(inColumnNames.indexOf(colIndxName));
+        if (cell != null) {
+          final Integer lineNum = cell.getRowIndex();
+          final Long id;
+          if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC) {
+            id = (long) cell.getNumericCellValue();
+          } else if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
+            final String cellValue = cell.getStringCellValue();
+            if (StringUtils.isNumeric(cellValue)) {
+              id = Long.valueOf(cellValue);
             } else {
-                if (!this.inColumnNames.contains(i)) {
-                    throw new IllegalArgumentException(String.format("Column 'in' %s not found", i));
-                }
+              LOG.debug("The cell at row {}, col {} has no numeric value ({})", cell.getRow(),
+                  cell.getColumnIndex(), cellValue);
+              id = null;
             }
-        }
-        this.in = in;
-        // prepare index
-        INDEXES.clear();
-        final Iterator<Row> rowIterator = this.inSelectedSheet.rowIterator();
-        assert rowIterator.hasNext();
-        // header
-        rowIterator.next();
-        while (rowIterator.hasNext()) {
-            final Row row = rowIterator.next();
-            for (final String colIndxName : in) {
-                final Cell cell = row.getCell(inColumnNames.indexOf(colIndxName));
-                final String cellValue = cell.getStringCellValue();
-                if (StringUtils.isNumeric(cellValue)) {
-                    final Long id = Long.valueOf(cellValue);
-                    final Integer lineNum = cell.getRowIndex();
-                    if (INDEXES.containsKey(id)) {
-                        throw new IllegalArgumentException(String.format("id '%d' already exists", id));
-                    } else {
-                        INDEXES.put(id, lineNum);
-                    }
-                }
+          } else {
+            LOG.warn("The cell at row {}, col {} is neither numeric or string", cell.getRow(),
+                cell.getColumnIndex());
+            id = null;
+          }
+          if (id != null) {
+            if (INDEXES.containsKey(id)) {
+              final Set<Integer> ids = INDEXES.get(id);
+              final boolean alreadyExists = ids.add(lineNum);
+              if (alreadyExists) {
+                LOG.warn("id '{}' exists at lines {}", id, Arrays.toString(ids.toArray()));
+              }
+            } else {
+              final Set<Integer> ids = new HashSet<>();
+              ids.add(lineNum);
+              INDEXES.put(id, ids);
             }
+          }
         }
-
+      }
     }
+  }
 
-    public void updateStock(final UpdateType updateType,
-                            final Map<Long, Long> stock) {
-        if (stock == null) {
-            throw new NullPointerException("Stock cannot be 'null'");
-        }
-        if (stock.isEmpty()) {
-            throw new IllegalArgumentException("Stock cannot be empty");
-        }
-        if (updateType == null) {
-            throw new NullPointerException("Update Type cannot be 'null'");
-        }
-        LOG.info("Updating stock");
+  public void updateStock(final UpdateType updateType,
+                          final Map<Long, Long> stock) {
+    if (stock == null) {
+      throw new NullPointerException("Stock cannot be 'null'");
     }
+    if (stock.isEmpty()) {
+      throw new IllegalArgumentException("Stock cannot be empty");
+    }
+    if (updateType == null) {
+      throw new NullPointerException("Update Type cannot be 'null'");
+    }
+    LOG.info("Updating stock");
+    stock.forEach((id, quantity) -> {
+      if (id != null && quantity != null) {
+        final Set<Integer> rows = INDEXES.get(id);
+        if (rows != null && !rows.isEmpty()) {
+          updateStock(updateType, rows, quantity);
+        } else {
+          LOG.warn("Article {} has not been found!", id);
+        }
+      }
+    });
+  }
+
+  void updateStock(final UpdateType updateType, final Set<Integer> rows, final long quantity) {
+    assert updateType != null;
+    assert rows != null;
+    assert !rows.isEmpty();
+    final int outIndex = this.columnNames.indexOf(out);
+    rows.stream().filter(r -> r != null)
+        .forEach(row -> {
+          final XSSFRow r = selectedSheet.getRow(row);
+          XSSFCell cell = r.getCell(outIndex);
+          if (cell == null) {
+            cell = r.createCell(outIndex);
+          }
+          // TODO get original stock
+          switch (updateType) {
+            case UPDATE:
+              cell.setCellValue(quantity);
+              break;
+            case ADD:
+              LOG.warn("NOT YET IMPLEMENTED");
+              break;
+            case SUBSTRACT:
+              LOG.warn("NOT YET IMPLEMENTED");
+              break;
+          }
+        });
+  }
+
+  /**
+   * Save the sheet on the stream. The stream will not be closed!
+   * @param stream the stream.
+   * @throws IOException if a problem with the stream.
+   */
+  public void writeExcelWorkbook(final OutputStream stream) throws IOException {
+    this.excelWorkbook.write(stream);
+  }
 
 }
