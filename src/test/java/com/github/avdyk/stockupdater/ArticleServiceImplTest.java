@@ -27,20 +27,20 @@ public class ArticleServiceImplTest {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        service = new ArticleService(Paths.get("target/test-classes/articles.xlsx"));
+        service = new ArticleService(Paths.get("target/test-classes/articles.xlsx"), null);
         STOCK_4950344996964.put(4950344996964L, 1L);
         STOCK_08702.put(8702L, 5L);
     }
 
     private void initArticleService() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setIn(IN_COLUMNS);
         service.setOut(NEW_STOCK);
     }
 
     @Test
     public void sheetNamesTest() {
-        List<String> sheetNames = service.getSheetNames();
+        List<String> sheetNames = service.getInSheetNames();
         Assert.assertEquals(1, sheetNames.size());
         Assert.assertEquals(MAIN_SHEET, sheetNames.get(0));
         Assert.assertFalse(sheetNames.contains("toto"));
@@ -48,36 +48,36 @@ public class ArticleServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void selectedSheetFailTest() {
-        service.setSelectedSheet("toto");
+        service.setInSelectedSheet("toto");
     }
 
     @Test
     public void selectedSheetTest() {
-        service.setSelectedSheet(MAIN_SHEET);
-        Assert.assertEquals(16, service.getColumnNames().size());
+        service.setInSelectedSheet(MAIN_SHEET);
+        Assert.assertEquals(16, service.getInColumnNames().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void inColumnKO() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setIn(Arrays.asList("toto", "no more"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void inNullColumnKO() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setIn(Arrays.asList(new String[] {null}));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void inNoColumnsKO() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setIn(Collections.emptyList());
     }
 
     @Test
     public void inOneColumnOK() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         final List<String> oneArg = new ArrayList<>();
         oneArg.add("s_id");
         service.setIn(oneArg);
@@ -87,7 +87,7 @@ public class ArticleServiceImplTest {
 
     @Test
     public void inAllGoodColumns() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setIn(ALL_IN_COLUMNS);
         Assert.assertEquals(Arrays.asList("s_modele", "s_cle1", "s_cle2", "s_cle3", "s_id", "s_modelen",
                 "s_id_rayon", "s_id_famil", "s_id_ssfam", "s_qdispo", "s_qv_1", "s_qv_2", "s_qv_3",
@@ -97,20 +97,20 @@ public class ArticleServiceImplTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void inMultipleColumnsWithBadOneKO() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setIn(Arrays.asList("s_modele", "s_cle1", "s_cle2", "toto", "s_id", "newstock"));
         Assert.assertEquals(16, service.getIn().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void outNotFound() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setOut("toto");
     }
 
     @Test
     public void outOk() {
-        service.setSelectedSheet(MAIN_SHEET);
+        service.setInSelectedSheet(MAIN_SHEET);
         service.setOut("newstock");
         Assert.assertEquals("newstock", service.getOut());
     }
