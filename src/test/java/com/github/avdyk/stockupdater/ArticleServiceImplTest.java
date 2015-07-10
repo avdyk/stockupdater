@@ -1,5 +1,7 @@
 package com.github.avdyk.stockupdater;
 
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -30,95 +32,95 @@ public class ArticleServiceImplTest {
   private static Map<Long, Long> STOCK_4950344996964 = new HashMap<>();
   private static Map<Long, Long> STOCK_08702 = new HashMap<>();
 
-    @BeforeClass
-    public static void beforeClass() throws IOException {
-        service = new ArticleService(Paths.get("target/test-classes/articles.xlsx"), null);
-        STOCK_4950344996964.put(4950344996964L, 1L);
-        STOCK_08702.put(8702L, 5L);
-    }
+  @BeforeClass
+  public static void beforeClass() throws IOException {
+    service = new ArticleService(Paths.get("target/test-classes/articles.xlsx"), null);
+    STOCK_4950344996964.put(4950344996964L, 1L);
+    STOCK_08702.put(8702L, 5L);
+  }
 
-    private void initArticleService() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setIn(IN_COLUMNS);
-        service.setOut(NEW_STOCK);
-    }
+  private void initArticleService() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setIn(IN_COLUMNS);
+    service.setOut(NEW_STOCK);
+  }
 
-    @Test
-    public void sheetNamesTest() {
-        List<String> sheetNames = service.getInSheetNames();
-        Assert.assertEquals(1, sheetNames.size());
-        Assert.assertEquals(MAIN_SHEET, sheetNames.get(0));
-        Assert.assertFalse(sheetNames.contains("toto"));
-    }
+  @Test
+  public void sheetNamesTest() {
+    List<String> sheetNames = service.getInSheetNames();
+    Assert.assertEquals(1, sheetNames.size());
+    Assert.assertEquals(MAIN_SHEET, sheetNames.get(0));
+    Assert.assertFalse(sheetNames.contains("toto"));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void selectedSheetFailTest() {
-        service.setInSelectedSheet("toto");
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void selectedSheetFailTest() {
+    service.setInSelectedSheet("toto");
+  }
 
-    @Test
-    public void selectedSheetTest() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        Assert.assertEquals(16, service.getInColumnNames().size());
-    }
+  @Test
+  public void selectedSheetTest() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    Assert.assertEquals(16, service.getInColumnNames().size());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void inColumnKO() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setIn(Arrays.asList("toto", "no more"));
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void inColumnKO() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setIn(Arrays.asList("toto", "no more"));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void inNullColumnKO() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setIn(Arrays.asList(new String[] {null}));
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void inNullColumnKO() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setIn(Arrays.asList(new String[]{null}));
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void inNoColumnsKO() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setIn(Collections.emptyList());
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void inNoColumnsKO() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setIn(Collections.emptyList());
+  }
 
-    @Test
-    public void inOneColumnOK() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        final List<String> oneArg = new ArrayList<>();
-        oneArg.add("s_id");
-        service.setIn(oneArg);
-        Assert.assertTrue(service.getIn().contains("s_id"));
-        Assert.assertEquals(1, service.getIn().size());
-    }
+  @Test
+  public void inOneColumnOK() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    final List<String> oneArg = new ArrayList<>();
+    oneArg.add("s_id");
+    service.setIn(oneArg);
+    Assert.assertTrue(service.getIn().contains("s_id"));
+    Assert.assertEquals(1, service.getIn().size());
+  }
 
-    @Test
-    public void inAllGoodColumns() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setIn(ALL_IN_COLUMNS);
-        Assert.assertEquals(Arrays.asList("s_modele", "s_cle1", "s_cle2", "s_cle3", "s_id", "s_modelen",
-                "s_id_rayon", "s_id_famil", "s_id_ssfam", "s_qdispo", "s_qv_1", "s_qv_2", "s_qv_3",
-                "s_qa_1", "s_qa_2", "newstock"), service.getIn());
-        Assert.assertEquals(16, service.getIn().size());
-    }
+  @Test
+  public void inAllGoodColumns() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setIn(ALL_IN_COLUMNS);
+    Assert.assertEquals(Arrays.asList("s_modele", "s_cle1", "s_cle2", "s_cle3", "s_id", "s_modelen",
+        "s_id_rayon", "s_id_famil", "s_id_ssfam", "s_qdispo", "s_qv_1", "s_qv_2", "s_qv_3",
+        "s_qa_1", "s_qa_2", "newstock"), service.getIn());
+    Assert.assertEquals(16, service.getIn().size());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void inMultipleColumnsWithBadOneKO() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setIn(Arrays.asList("s_modele", "s_cle1", "s_cle2", "toto", "s_id", "newstock"));
-        Assert.assertEquals(16, service.getIn().size());
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void inMultipleColumnsWithBadOneKO() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setIn(Arrays.asList("s_modele", "s_cle1", "s_cle2", "toto", "s_id", "newstock"));
+    Assert.assertEquals(16, service.getIn().size());
+  }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void outNotFound() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setOut("toto");
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void outNotFound() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setOut("toto");
+  }
 
-    @Test
-    public void outOk() {
-        service.setInSelectedSheet(MAIN_SHEET);
-        service.setOut("newstock");
-        Assert.assertEquals("newstock", service.getOut());
-    }
+  @Test
+  public void outOk() {
+    service.setInSelectedSheet(MAIN_SHEET);
+    service.setOut("newstock");
+    Assert.assertEquals("newstock", service.getOut());
+  }
 
   @Test(expected = NullPointerException.class)
   public void updateStockNullStockType() {
@@ -149,8 +151,8 @@ public class ArticleServiceImplTest {
   public void stockUpdateArticle() throws IOException {
     initArticleService();
     service.updateStock(UpdateType.UPDATE, STOCK_08702);
-    final XSSFRow r60 = service.getSelectedSheet().getRow(59);
-    final XSSFRow r71 = service.getSelectedSheet().getRow(70);
+    final XSSFRow r60 = service.getInSelectedSheet().getRow(59);
+    final XSSFRow r71 = service.getInSelectedSheet().getRow(70);
     final XSSFCell cell60 = r60.getCell(15);
     final XSSFCell cell71 = r71.getCell(15);
     Assert.assertNotNull(cell60);
