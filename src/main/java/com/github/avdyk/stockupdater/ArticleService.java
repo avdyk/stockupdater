@@ -3,7 +3,6 @@ package com.github.avdyk.stockupdater;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -30,86 +29,150 @@ public class ArticleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ArticleService.class);
 
-    XSSFWorkbook excelWorkbook;
-    List<String> sheetNames;
-    XSSFSheet selectedSheet;
-    List<String> columnNames;
+    XSSFWorkbook excelWorkbookIn;
+    XSSFWorkbook excelWorkbookOut;
+    List<String> inSheetNames;
+    XSSFSheet inSelectedSheet;
+    List<String> inColumnNames;
+    List<String> outSheetNames;
+    XSSFSheet outSelectedSheet;
+    List<String> outColumnNames;
 
     String out;
+    String stock;
     List<String> in;
     Map<Long, Integer> INDEXES = new HashMap<>();
 
     @Autowired
-    public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile) throws IOException {
-        this(new XSSFWorkbook(Files.newInputStream(excelFile)));
+    public ArticleService(@Value("#{confImpl.excelFileIn}") final Path excelFileIn,
+                          @Value("#{confImpl.excelFileOut}") final Path excelFileOut) throws IOException {
+        this(new XSSFWorkbook(Files.newInputStream(excelFileIn)),
+                new XSSFWorkbook(Files.newInputStream(excelFileOut)));
     }
 
     @Autowired
-    public ArticleService(final XSSFWorkbook workbook) {
-        this.excelWorkbook = workbook;
-        final int numberOfSheets = this.excelWorkbook.getNumberOfSheets();
-        final List<String> names = new ArrayList<>(numberOfSheets);
-        for (int i = 0; i < numberOfSheets; i++) {
-            names.add(this.excelWorkbook.getSheetName(i));
+    public ArticleService(final XSSFWorkbook workbookIn, final XSSFWorkbook workbookOut) {
+        this.excelWorkbookIn = workbookIn;
+        final int numberOfInSheets = this.excelWorkbookIn.getNumberOfSheets();
+        final List<String> inNames = new ArrayList<>(numberOfInSheets);
+        for (int i = 0; i < numberOfInSheets; i++) {
+            inNames.add(this.excelWorkbookIn.getSheetName(i));
         }
-        this.sheetNames = Collections.unmodifiableList(names);
+        this.inSheetNames = Collections.unmodifiableList(inNames);
+        if (workbookOut == null) {
+            this.excelWorkbookOut = this.excelWorkbookIn;
+            this.outSheetNames = inSheetNames;
+        } else {
+            this.excelWorkbookOut = workbookOut;
+            final int numberOfOutSheets = this.excelWorkbookOut.getNumberOfSheets();
+            final List<String> outNames = new ArrayList<>(numberOfOutSheets);
+            for (int i = 0; i < numberOfOutSheets; i++) {
+                outNames.add(this.excelWorkbookOut.getSheetName(i));
+            }
+            this.outSheetNames = Collections.unmodifiableList(outNames);
+        }
     }
 
     @Autowired
-    public ArticleService(@Value("#{confImpl.excelFile}") final Path excelFile,
-                          @Value("#{confImpl.sheetName}") final String sheetName,
+    public ArticleService(@Value("#{confImpl.excelFileIn}") final Path excelFileIn,
+                          @Value("#{confImpl.excelFileOut}") final Path excelFileOut,
+                          @Value("#{confImpl.sheetNameIn}") final String sheetNameIn,
+                          @Value("#{confImpl.sheetNameOut}") final String sheetNameOut,
+                          @Value("#{confImpl.excelStockColumn}") final String stock,
                           @Value("#{confImpl.out}") final String out,
                           @Value("#{confImpl.in}") final String... in) throws IOException {
-        this(excelFile);
+        this(excelFileIn, excelFileOut);
         // pre-requis:
+        this._setStock(stock);
         this._setOut(out);
         this._setIn(Arrays.asList(in));
         if (LOG.isDebugEnabled()) {
-            final int sheets = excelWorkbook.getNumberOfSheets();
+            final int sheets = excelWorkbookIn.getNumberOfSheets();
             for (int i = 0; i < sheets; i++) {
-                LOG.debug("Sheet {}: {}", i, excelWorkbook.getSheetName(i));
+                LOG.debug("Sheet {}: {}", i, excelWorkbookIn.getSheetName(i));
             }
         }
-        if (sheetName != null) {
-            this.setSelectedSheet(sheetName);
-            LOG.debug("Reading sheet {}", sheetName);
+        if (sheetNameIn != null) {
+            this.setInSelectedSheet(sheetNameIn);
+            LOG.debug("Reading in sheet {}", sheetNameIn);
         } else {
-            this.setSelectedSheet(excelWorkbook.getSheetAt(0).getSheetName());
-            LOG.debug("No sheet name, picking the first one");
+            this.setInSelectedSheet(excelWorkbookIn.getSheetAt(0).getSheetName());
+            LOG.debug("No in sheet name, picking the first one");
+        }
+        if (sheetNameOut != null) {
+            this.setOutSelectedSheet(sheetNameOut);
+            LOG.debug("Reading out sheet {}", sheetNameOut);
+        } else {
+            this.setOutSelectedSheet(excelWorkbookOut.getSheetAt(0).getSheetName());
+            LOG.debug("No out sheet name, picking the first one");
         }
     }
 
-    public List<String> getSheetNames() {
-        return new ArrayList<>(this.sheetNames);
+    public List<String> getInSheetNames() {
+        return new ArrayList<>(this.inSheetNames);
     }
 
-    public void setSelectedSheet(final String selectedSheetName) {
-        this.selectedSheet = this.excelWorkbook.getSheet(selectedSheetName);
-        if (this.selectedSheet != null) {
-            int outIndexTemp = -1;
-            final Iterator<Row> rowIter = this.selectedSheet.rowIterator();
-            if (rowIter != null && rowIter.hasNext()) {
-                final Row header = rowIter.next();
-                // parcourir les colonnes pour trouver la out
-                final Iterator<Cell> cellIterator = header.iterator();
-                final List<String> columnNames = new ArrayList<>();
-                while (cellIterator.hasNext()) {
-                    final Cell c = cellIterator.next();
-                    columnNames.add(c.getStringCellValue());
-                }
-                this.columnNames = Collections.unmodifiableList(columnNames);
+    public void setInSelectedSheet(final String selectedSheetName) {
+        this.inSelectedSheet = this.excelWorkbookIn.getSheet(selectedSheetName);
+        if (this.inSelectedSheet != null) {
+            this.inColumnNames = getColumnNamesFromSheet(this.inSelectedSheet);
+        } else {
+            throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
+        }
+    }
+
+    List<String> getColumnNamesFromSheet(final XSSFSheet sheet) {
+        final List<String> columnNames = new ArrayList<>();
+        final Iterator<Row> rowIter = sheet.rowIterator();
+        if (rowIter != null && rowIter.hasNext()) {
+            final Row header = rowIter.next();
+            // parcourir les colonnes pour trouver la out
+            final Iterator<Cell> cellIterator = header.iterator();
+            while (cellIterator.hasNext()) {
+                final Cell c = cellIterator.next();
+                columnNames.add(c.getStringCellValue());
             }
+        }
+        return Collections.unmodifiableList(columnNames);
+    }
+
+    public XSSFSheet getInSelectedSheet() {
+        return this.inSelectedSheet;
+    }
+
+    public void setOutSelectedSheet(final String selectedSheetName) {
+        this.outSelectedSheet = this.excelWorkbookOut.getSheet(selectedSheetName);
+        if (this.outSelectedSheet != null) {
+            this.outColumnNames = getColumnNamesFromSheet(this.outSelectedSheet);
         } else {
-            throw new IllegalArgumentException("Sheet not found");
+            throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
         }
     }
 
-    public XSSFSheet getSelectedSheet() {
-        return this.selectedSheet;
+    public XSSFSheet getOutSelectedSheet() {
+        return this.outSelectedSheet;
     }
 
-    public List<String> getColumnNames() {
-        return new ArrayList<>(this.columnNames);
+    public List<String> getInColumnNames() {
+        return new ArrayList<>(this.inColumnNames);
+    }
+
+    public String getStock() {
+        return stock;
+    }
+
+    public void setStock(final String stock) {
+        this._setStock(stock);
+    }
+
+    private void _setStock(final String stock) {
+        if (StringUtils.isBlank(this.stock)) {
+            throw new IllegalArgumentException("Unknown 'stock' column to update the stock");
+        }
+        if (!this.inColumnNames.contains(this.stock)) {
+            throw new IllegalArgumentException(String.format("Column 'stock' %s not found", out));
+        }
+        this.stock = stock;
     }
 
     public String getOut() {
@@ -124,7 +187,7 @@ public class ArticleService {
         if (StringUtils.isBlank(out)) {
             throw new IllegalArgumentException("Unknown 'out' column to update the stock");
         }
-        if (!this.columnNames.contains(out)) {
+        if (!this.outColumnNames.contains(out)) {
             throw new IllegalArgumentException(String.format("Column 'out' %s not found", out));
         }
         this.out = out;
@@ -146,7 +209,7 @@ public class ArticleService {
             if (StringUtils.isBlank(i)) {
                 throw new IllegalArgumentException("Illegal value for one of the 'in' column");
             } else {
-                if (!this.columnNames.contains(i)) {
+                if (!this.inColumnNames.contains(i)) {
                     throw new IllegalArgumentException(String.format("Column 'in' %s not found", i));
                 }
             }
@@ -154,14 +217,14 @@ public class ArticleService {
         this.in = in;
         // prepare index
         INDEXES.clear();
-        final Iterator<Row> rowIterator = this.selectedSheet.rowIterator();
+        final Iterator<Row> rowIterator = this.inSelectedSheet.rowIterator();
         assert rowIterator.hasNext();
         // header
         rowIterator.next();
         while (rowIterator.hasNext()) {
             final Row row = rowIterator.next();
             for (final String colIndxName : in) {
-                final Cell cell = row.getCell(columnNames.indexOf(colIndxName));
+                final Cell cell = row.getCell(inColumnNames.indexOf(colIndxName));
                 final String cellValue = cell.getStringCellValue();
                 if (StringUtils.isNumeric(cellValue)) {
                     final Long id = Long.valueOf(cellValue);
