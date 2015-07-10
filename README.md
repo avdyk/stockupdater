@@ -18,7 +18,8 @@ Example to launch the tests:
 
 * excel.file.in
 * excel.file.out
-* excel.sheetname
+* excel.sheetname.in
+* excel.sheetname.out
 * excel.stock
 * excel.out
 * excel.in

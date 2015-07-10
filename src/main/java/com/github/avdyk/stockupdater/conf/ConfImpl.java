@@ -21,7 +21,8 @@ public class ConfImpl {
     private final static Logger LOG = LoggerFactory.getLogger(ConfImpl.class);
     public static final String EXCEL_FILE_IN = "excel.file.in";
     public static final String EXCEL_FILE_OUT = "excel.file.out";
-    public static final String EXCEL_SHEETNAME = "excel.sheetname";
+    public static final String EXCEL_SHEETNAME_IN = "excel.sheetname.in";
+    public static final String EXCEL_SHEETNAME_OUT = "excel.sheetname.out";
     public static final String EXCEL_STOCK_COLUMN_NAME = "excel.stock";
     public static final String EXCEL_OUT_COLUMN_NAME = "excel.out";
     public static final String EXCEL_IN_COLUMN_NAMES = "excel.in";
@@ -34,7 +35,8 @@ public class ConfImpl {
     private Path excelFileOut;
     private Path stockFile;
     private UpdateType updateType;
-    private String sheetName;
+    private String sheetNameIn;
+    private String sheetNameOut;
     private String stockColumn;
     private String out;
     private String[] in;
@@ -53,9 +55,12 @@ public class ConfImpl {
             this.setExcelFileOut(Paths.get(exFOutstr));
         }
         LOG.debug("Excel out filename: {}", excelFileOut);
-        // EXCEL_SHEETNAME
-        this.setSheetName(env.getProperty(EXCEL_SHEETNAME));
-        LOG.debug("Excel sheetname: {}", sheetName);
+        // EXCEL_SHEETNAME_IN
+        this.setSheetNameIn(env.getProperty(EXCEL_SHEETNAME_IN));
+        LOG.debug("Excel sheetname in: {}", sheetNameIn);
+        // EXCEL_SHEETNAME_OUT
+        this.setSheetNameOut(env.getProperty(EXCEL_SHEETNAME_OUT));
+        LOG.debug("Excel sheetname out: {}", sheetNameOut);
         // EXCEL_STOCK_COLUMN_NAME
         this.setStockColumn(EXCEL_STOCK_COLUMN_NAME);
         LOG.debug("Excel stock column name: {}", EXCEL_STOCK_COLUMN_NAME);
@@ -114,12 +119,20 @@ public class ConfImpl {
         this.updateType = updateType;
     }
 
-    public String getSheetName() {
-        return sheetName;
+    public String getSheetNameIn() {
+        return sheetNameIn;
     }
 
-    public void setSheetName(final String sheetName) {
-        this.sheetName = sheetName;
+    public void setSheetNameIn(final String sheetName) {
+        this.sheetNameIn = sheetName;
+    }
+
+    public String getSheetNameOut() {
+        return sheetNameOut;
+    }
+
+    public void setSheetNameOut(final String sheetName) {
+        this.sheetNameOut = sheetName;
     }
 
     public String getStockColumn() {
