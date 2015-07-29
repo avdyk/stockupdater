@@ -252,6 +252,14 @@ public class ArticleService {
     }
   }
 
+  public ExcelUtilServiceImpl getExcelUtilService() {
+    return excelUtilService;
+  }
+
+  public void setExcelUtilService(final ExcelUtilServiceImpl excelUtilService) {
+    this.excelUtilService = excelUtilService;
+  }
+
   public void updateStock(final UpdateType updateType,
                           final Map<Long, Long> stock) {
     if (stock == null) {

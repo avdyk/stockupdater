@@ -5,6 +5,11 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -18,6 +23,8 @@ import java.util.Map;
 /**
  * Tests the article service.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = TestConfig.class)
 public class ArticleServiceImplTest {
 
   public static final List<String> ALL_IN_COLUMNS = Collections.unmodifiableList(Arrays.asList
@@ -28,13 +35,14 @@ public class ArticleServiceImplTest {
       ("s_cle1", "s_cle2", "s_cle3", "s_id"));
   public static final String MAIN_SHEET = "export articles mercator";
   public static final String NEW_STOCK = "newstock";
-  private static ArticleService service;
+  @Autowired
+  private ArticleService service;
   private static Map<Long, Long> STOCK_4950344996964 = new HashMap<>();
   private static Map<Long, Long> STOCK_08702 = new HashMap<>();
 
   @BeforeClass
   public static void beforeClass() throws IOException {
-    service = new ArticleService(Paths.get("target/test-classes/articles.xlsx"), null);
+    // service = new ArticleService(Paths.get("target/test-classes/articles.xlsx"), null);
     STOCK_4950344996964.put(4950344996964L, 1L);
     STOCK_08702.put(8702L, 5L);
   }
