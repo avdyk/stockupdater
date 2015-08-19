@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?language javascript?>
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -14,35 +13,26 @@
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0"/>
       </columnConstraints>
-      <!--<rowConstraints>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-        <!--<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>-->
-      <!--</rowConstraints>-->
       <children>
         <Label text="Excel file in"/>
         <Button fx:id="excelFileInButton" mnemonicParsing="false" text="Open file" GridPane.columnIndex="2"/>
         <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1"/>
         <Label text="In Sheet" GridPane.rowIndex="1"/>
-        <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
         <Label text="In columns" GridPane.rowIndex="2"/>
-        <ChoiceBox GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <ChoiceBox fx:id="inColumnsChoiceBox" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
         <Label text="Stock Column" GridPane.rowIndex="3"/>
-        <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
         <Label text="Excel file out" GridPane.rowIndex="4"/>
-        <TextField GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <Button mnemonicParsing="false" text="Open file" GridPane.columnIndex="2" GridPane.rowIndex="4"/>
+        <TextField fx:id="excelFileOutTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <Button fx:id="excelFileOutButton" mnemonicParsing="false" text="Open file" GridPane.columnIndex="2"
+                GridPane.rowIndex="4"/>
         <Label text="out sheet" GridPane.rowIndex="5"/>
-        <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        <ComboBox fx:id="outSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
         <Label text="Out column" GridPane.rowIndex="6"/>
-        <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
         <Label text="Update Type" GridPane.rowIndex="7"/>
-        <ComboBox GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
         <Label text="Stock text file" GridPane.rowIndex="8"/>
         <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
         <Button fx:id="stockFileButton" mnemonicParsing="false" text="Open stock text file" GridPane.columnIndex="2"
