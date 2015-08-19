@@ -1,6 +1,7 @@
 package com.github.avdyk.stockupdater.conf;
 
 import com.github.avdyk.stockupdater.UpdateType;
+import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 
@@ -17,13 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Configuration
-@PropertySource("classpath:stockupdater.properties")
+@PropertySources({@PropertySource("classpath:stockupdater.properties")})
 @ComponentScan(basePackages = {"com.github.avdyk.stockupdater"})
 public class ConfImpl {
 
   private final static Logger LOG = LoggerFactory.getLogger(ConfImpl.class);
-  public static final String APPLICATION_NAME = "project.name";
-  public static final String VERSION = "project.version";
+  public static final String APPLICATION_NAME = "${application.name}";
+  public static final String VERSION = "${application.version}";
   public static final String EXCEL_FILE_IN = "excel.file.in";
   public static final String EXCEL_FILE_OUT = "excel.file.out";
   public static final String EXCEL_SHEETNAME_IN = "excel.sheetname.in";
@@ -36,6 +38,8 @@ public class ConfImpl {
 
   @Autowired
   private Environment env;
+  @Autowired
+  private JavaFxControllerFactory javaFxControllerFactory;
   @Value(APPLICATION_NAME)
   private String applicationName;
   @Value(VERSION)
@@ -53,9 +57,9 @@ public class ConfImpl {
   @PostConstruct
   void postConstruct() {
     // APPLICATION_NAME
-    // applicationName = env.getProperty(APPLICATION_NAME);
+    LOG.debug("Application name: {}", applicationName);
     // VERSION
-    // version = env.getProperty(VERSION);
+    LOG.debug("Application version: {}", version);
     // EXCEL_FILE_IN
     final String exFstr = env.getProperty(EXCEL_FILE_IN);
     if (exFstr != null) {

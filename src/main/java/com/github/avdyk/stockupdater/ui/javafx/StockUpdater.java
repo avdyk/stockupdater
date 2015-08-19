@@ -3,7 +3,6 @@ package com.github.avdyk.stockupdater.ui.javafx;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController;
 import javafx.application.Application;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -29,11 +28,10 @@ public class StockUpdater extends Application {
   public void start(Stage primaryStage) throws Exception {
     AnnotationConfigApplicationContext context
         = new AnnotationConfigApplicationContext(ConfImpl.class);
+    MainFrameController controller = context.getBean(MainFrameController.class);
+    controller.setStage(primaryStage);
     ConfImpl conf = context.getBean(ConfImpl.class);
-    SpringFxmlLoader loader = new SpringFxmlLoader(context);
-
-    Parent root = (Parent) loader.load("/fxviews/MainFrame.fxml", MainFrameController.class);
-    Scene scene = new Scene(root, 320, 240);
+    Scene scene = new Scene(controller.getView(), 450, 300);
     scene.getStylesheets().add("/css/stockupdater.css");
     primaryStage.setScene(scene);
     primaryStage.setTitle(String.format("%s - %s", conf.getApplicationName(), conf.getVersion()));
