@@ -3,6 +3,8 @@ package com.github.avdyk.stockupdater.ui.javafx.controller;
 import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -90,7 +92,13 @@ public class MainFrameController implements Initializable {
     // - excel in field
     excelFileInTextField.textProperty().bind(mainPresentationModel.excelFileInProperty());
     // - populate sheetnames of excel in file
-    inSheetComboBox.itemsProperty().bind(mainPresentationModel.excelFileInSheetNamesProperty());
+//    inSheetComboBox.itemsProperty().bind(mainPresentationModel.excelFileInSheetNamesProperty());
+    inSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameInProperty());
+    inSheetComboBox.setItems(mainPresentationModel.excelFileInSheetNamesProperty());
+    // FIXME tests de mise en place de la liste
+    ObservableList<String> obl = FXCollections.observableArrayList();
+    obl.addAll("valeur 1", "une autre valeur", "etc");
+    mainPresentationModel.setExcelFileInSheetNames(obl);
 //    // - selected sheetname of excel in file
 //    mainPresentationModel.sheetNameInProperty().bind(inSheetComboBox.itemsProperty());
 //    // - populate column names from in sheet
