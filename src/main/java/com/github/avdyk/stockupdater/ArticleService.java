@@ -16,32 +16,64 @@ import java.util.Map;
  */
 public interface ArticleService {
 
-  List<String> getSheetsName(final XSSFWorkbook workbookIn);
+  // TODO new design
+  void setWorkbook(final XSSFWorkbook workbook);
 
+  XSSFWorkbook getWorkbook();
+
+  List<String> getSheetsName();
+
+  void setSelectedSheetName(final String sheetName);
+
+  String getSelectedSheetName();
+
+  /**
+   * Pas nécessaire?..
+   * @return
+   * @deprecated nécessaire?
+   */
+  XSSFSheet getSelectedSheet();
+
+  List<String> getColumnsName();
+
+  // TODO old design
+  @Deprecated
   List<String> getInSheetNames();
 
+  @Deprecated
   void setInSelectedSheet(String selectedSheetName);
 
+  @Deprecated
   XSSFSheet getInSelectedSheet();
 
+  @Deprecated
   void setOutSelectedSheet(String selectedSheetName);
 
+  @Deprecated
   XSSFSheet getOutSelectedSheet();
 
+  @Deprecated
   List<String> getInColumnNames();
 
+  @Deprecated
   String getStock();
 
+  @Deprecated
   void setStock(String stock);
 
+  @Deprecated
   String getOut();
 
+  @Deprecated
   void setOut(String out);
 
+  @Deprecated
   List<String> getIn();
 
+  @Deprecated
   void setIn(List<String> in);
 
+  @Deprecated
   void updateStock(UpdateType updateType,
                    Map<Long, Long> stock);
 
@@ -51,5 +83,6 @@ public interface ArticleService {
    * @param stream the stream.
    * @throws java.io.IOException if a problem with the stream.
    */
+  @Deprecated
   void writeExcelWorkbook(OutputStream stream) throws IOException;
 }

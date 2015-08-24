@@ -32,6 +32,10 @@ public class ArticleServiceImpl implements ArticleService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
+  XSSFWorkbook workbook;
+  XSSFSheet selectedSheet;
+  String selectedSheetName;
+
   XSSFWorkbook excelWorkbookIn;
   XSSFWorkbook excelWorkbookOut;
   List<String> inSheetNames;
@@ -48,7 +52,11 @@ public class ArticleServiceImpl implements ArticleService {
   @Autowired
   private ExcelUtilServiceImpl excelUtilService;
 
-  @Autowired
+  public ArticleServiceImpl() {
+    super();
+  }
+
+//  @Autowired
   public ArticleServiceImpl(@Value("#{confImpl.excelFileIn}") final Path excelFileIn,
                             @Value("#{confImpl.excelFileOut}") final Path excelFileOut) throws IOException {
     this(new XSSFWorkbook(Files.newInputStream(excelFileIn)),
@@ -56,30 +64,20 @@ public class ArticleServiceImpl implements ArticleService {
             : new XSSFWorkbook(Files.newInputStream(excelFileIn)));
   }
 
-  @Autowired
+//  @Autowired
   public ArticleServiceImpl(final XSSFWorkbook workbookIn, final XSSFWorkbook workbookOut) {
     this.excelWorkbookIn = workbookIn;
-    final int numberOfInSheets = this.excelWorkbookIn.getNumberOfSheets();
-    final List<String> inNames = new ArrayList<>(numberOfInSheets);
-    for (int i = 0; i < numberOfInSheets; i++) {
-      inNames.add(this.excelWorkbookIn.getSheetName(i));
-    }
-    this.inSheetNames = Collections.unmodifiableList(inNames);
+    this.inSheetNames = getSheetsName(workbookIn);
     if (workbookOut == null) {
       this.excelWorkbookOut = this.excelWorkbookIn;
       this.outSheetNames = inSheetNames;
     } else {
       this.excelWorkbookOut = workbookOut;
-      final int numberOfOutSheets = this.excelWorkbookOut.getNumberOfSheets();
-      final List<String> outNames = new ArrayList<>(numberOfOutSheets);
-      for (int i = 0; i < numberOfOutSheets; i++) {
-        outNames.add(this.excelWorkbookOut.getSheetName(i));
-      }
-      this.outSheetNames = Collections.unmodifiableList(outNames);
+      this.outSheetNames = getSheetsName(workbookOut);
     }
   }
 
-  @Autowired
+//  @Autowired
   public ArticleServiceImpl(@Value("#{confImpl.excelFileIn}") final Path excelFileIn,
                             @Value("#{confImpl.excelFileOut}") final Path excelFileOut,
                             @Value("#{confImpl.sheetNameIn}") final String sheetNameIn,
@@ -115,21 +113,20 @@ public class ArticleServiceImpl implements ArticleService {
   }
 
   @Override
-  public List<String> getInSheetNames() {
-    return new ArrayList<>(this.inSheetNames);
+  public List<String> getSheetsName() {
+    return getSheetsName(this.workbook);
   }
 
-  @Override
-  public void setInSelectedSheet(final String selectedSheetName) {
-    this.inSelectedSheet = this.excelWorkbookIn.getSheet(selectedSheetName);
-    if (this.inSelectedSheet != null) {
-      this.inColumnNames = getColumnNamesFromSheet(this.inSelectedSheet);
-    } else {
-      throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
+  List<String> getSheetsName(final XSSFWorkbook wb) {
+    final int numberOfInSheets = wb.getNumberOfSheets();
+    final List<String> inNames = new ArrayList<>(numberOfInSheets);
+    for (int i = 0; i < numberOfInSheets; i++) {
+      inNames.add(wb.getSheetName(i));
     }
+    return Collections.unmodifiableList(inNames);
   }
 
-  List<String> getColumnNamesFromSheet(final XSSFSheet sheet) {
+  List<String> getColumnsName(final XSSFSheet sheet) {
     final List<String> columnNames = new ArrayList<>();
     final Iterator<Row> rowIter = sheet.rowIterator();
     if (rowIter != null && rowIter.hasNext()) {
@@ -141,7 +138,46 @@ public class ArticleServiceImpl implements ArticleService {
         columnNames.add(c.getStringCellValue());
       }
     }
-    return Collections.unmodifiableList(columnNames);
+    return columnNames;
+  }
+
+  @Override
+  public String getSelectedSheetName() {
+    return selectedSheetName;
+  }
+
+  @Override
+  public void setSelectedSheetName(String selectedSheetName) {
+    this.selectedSheetName = selectedSheetName;
+    this.selectedSheet = this.workbook.getSheet(selectedSheetName);
+  }
+
+  @Override
+  public XSSFSheet getSelectedSheet() {
+    return selectedSheet;
+  }
+
+  @Override
+  public List<String> getColumnsName() {
+    return getColumnsName(this.selectedSheet);
+  }
+
+
+
+  // TODO old API
+  @Override
+  public List<String> getInSheetNames() {
+    return new ArrayList<>(this.inSheetNames);
+  }
+
+  @Override
+  public void setInSelectedSheet(final String selectedSheetName) {
+    this.inSelectedSheet = this.excelWorkbookIn.getSheet(selectedSheetName);
+    if (this.inSelectedSheet != null) {
+      this.inColumnNames = getColumnsName(this.inSelectedSheet);
+    } else {
+      throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
+    }
   }
 
   @Override
@@ -150,10 +186,20 @@ public class ArticleServiceImpl implements ArticleService {
   }
 
   @Override
+  public XSSFWorkbook getWorkbook() {
+    return workbook;
+  }
+
+  @Override
+  public void setWorkbook(XSSFWorkbook workbook) {
+    this.workbook = workbook;
+  }
+
+  @Override
   public void setOutSelectedSheet(final String selectedSheetName) {
     this.outSelectedSheet = this.excelWorkbookOut.getSheet(selectedSheetName);
     if (this.outSelectedSheet != null) {
-      this.outColumnNames = getColumnNamesFromSheet(this.outSelectedSheet);
+      this.outColumnNames = getColumnsName(this.outSelectedSheet);
     } else {
       throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
     }
@@ -262,16 +308,6 @@ public class ArticleServiceImpl implements ArticleService {
         }
       }
     }
-  }
-
-  @Override
-  public ExcelUtilServiceImpl getExcelUtilService() {
-    return excelUtilService;
-  }
-
-  @Override
-  public void setExcelUtilService(final ExcelUtilServiceImpl excelUtilService) {
-    this.excelUtilService = excelUtilService;
   }
 
   @Override
