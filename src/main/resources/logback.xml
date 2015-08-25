@@ -14,7 +14,7 @@
 
   <logger name="org.springframework" level="warn" />
   <logger name="com.github.avdyk.stockupdater" level="info" />
-  <logger name="com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController" level="debug"/>
+  <!--<logger name="com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController" level="trace"/>-->
 
   <root level="info">
     <!--<appender-ref ref="FILE"/>-->
