@@ -2,6 +2,7 @@ package com.github.avdyk.stockupdater.ui.javafx.controller;
 
 import com.github.avdyk.stockupdater.ArticleService;
 import com.github.avdyk.stockupdater.StockCompute;
+import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import javafx.beans.value.ObservableValue;
@@ -30,8 +31,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.StringJoiner;
 
 /**
  * Controller for the main frame.
@@ -59,25 +62,29 @@ public class MainFrameController implements Initializable {
   @FXML
   private TextField excelFileInTextField;
   @FXML
-  private ComboBox inSheetComboBox;
+  private ComboBox<String> inSheetComboBox;
   @FXML
-  private ChoiceBox inColumnsChoiceBox;
+  private ChoiceBox<String> inColumnsChoiceBox;
   @FXML
-  private ComboBox stockColumnsComboBox;
+  private ComboBox<String> stockColumnsComboBox;
   @FXML
   private TextField excelFileOutTextField;
   @FXML
   private Button excelFileOutButton;
   @FXML
-  private ComboBox outSheetComboBox;
+  private ComboBox<String> outSheetComboBox;
   @FXML
-  private ComboBox outColumnsComboBox;
+  private ComboBox<String> outColumnsComboBox;
   @FXML
-  private ComboBox updateTypeComboBox;
+  private ComboBox<UpdateType> updateTypeComboBox;
   @FXML
   private TextField stockFileTextField;
   @FXML
   private Button stockFileButton;
+  @FXML
+  private Button computeButton;
+  @FXML
+  private Button saveButton;
 
   public Parent getView() {
     return root;
@@ -89,6 +96,8 @@ public class MainFrameController implements Initializable {
     excelFileInButton.setOnAction(this::chooseExcelIn);
     excelFileOutButton.setOnAction(this::chooseExcelOut);
     stockFileButton.setOnAction(this::chooseStockTextFile);
+    computeButton.setOnAction(this::compute);
+    saveButton.setOnAction(this::save);
   }
 
   @SuppressWarnings("unused")
@@ -98,44 +107,43 @@ public class MainFrameController implements Initializable {
     // - excel in field
     excelFileInTextField.textProperty().bind(mainPresentationModel.excelFileInProperty());
     // - populate sheetnames of excel in file
-//    inSheetComboBox.itemsProperty().bind(mainPresentationModel.excelFileInSheetNamesProperty());
-    inSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameInProperty());
     inSheetComboBox.setItems(mainPresentationModel.excelFileInSheetNamesProperty());
     inSheetComboBox.valueProperty().addListener(this::inSheetSelected);
-//    // - selected sheetname of excel in file
-//    mainPresentationModel.sheetNameInProperty().bind(inSheetComboBox.itemsProperty());
+    // - selected sheetname of excel in file
+    inSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameInProperty());
     // - populate column names from in sheet
-    inColumnsChoiceBox.valueProperty().bind(mainPresentationModel.inColumnsProperty());
-//    // - selected in columns of excel in file
-//    mainPresentationModel.inProperty().bind(inColumnsChoiceBox.selectionModelProperty());
+    inColumnsChoiceBox.setItems(mainPresentationModel.inColumnsProperty());
+    inColumnsChoiceBox.valueProperty().addListener(this::inColumnSelected);
+    // - selected in columns of excel in file
+    inColumnsChoiceBox.valueProperty().bindBidirectional(mainPresentationModel.inProperty());
     // - populate stock columns from in sheet
-    stockColumnsComboBox.valueProperty().bind(mainPresentationModel.inColumnsProperty());
-//    // - selected stock column from excel in file
-//    mainPresentationModel.stockColumnProperty().bind(stockColumnsComboBox.selectionModelProperty());
+    stockColumnsComboBox.setItems(mainPresentationModel.inColumnsProperty());
+    stockColumnsComboBox.valueProperty().addListener(this::stockColumnSelected);
+    // - selected stock column from excel in file
+    stockColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.stockColumnProperty());
     // - excel out file
     excelFileOutTextField.textProperty().bind(mainPresentationModel.excelFileOutProperty());
     // - populate sheetnames of excel out file
-    outSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameOutProperty());
     outSheetComboBox.setItems(mainPresentationModel.excelFileOutSheetNamesProperty());
     outSheetComboBox.valueProperty().addListener(this::outSheetSelected);
-//    // - selected sheetname of excel out file
-//    mainPresentationModel.sheetNameOutProperty().bind(outSheetComboBox.itemsProperty());
+    // - selected sheetname of excel out file
+    outSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameOutProperty());
     // - populate column names from out sheet
-    outColumnsComboBox.valueProperty().bind(mainPresentationModel.outColumnsProperty());
-//    // - selected out column of excel out file
-//    mainPresentationModel.outProperty().bind(outColumnsComboBox.itemsProperty());
+    outColumnsComboBox.setItems(mainPresentationModel.outColumnsProperty());
+    outColumnsComboBox.valueProperty().addListener(this::outColumnSelected);
+    // - selected out column of excel out file
+    outColumnsComboBox.valueProperty().bind(mainPresentationModel.outProperty());
     // TODO updateTypeComboBox bindings
-
+    updateTypeComboBox.setItems(FXCollections.observableArrayList(UpdateType.values()));
     // - stock file field
     stockFileTextField.textProperty().bind(mainPresentationModel.stockFileProperty());
-    // bindings to actions
-    // businessController
+    // TODO bindings to button save and button compute enable
   }
 
   void chooseExcelIn(final ActionEvent actionEvent) {
     final String fileName = getPathFromUser("Open Excel In File");
     mainPresentationModel.setExcelFileIn(fileName);
-    if (fileName instanceof String && StringUtils.isNotBlank(fileName)) {
+    if (fileName != null && StringUtils.isNotBlank(fileName)) {
       try {
         final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
         articleServiceIn.setWorkbook(wb);
@@ -151,7 +159,7 @@ public class MainFrameController implements Initializable {
   void chooseExcelOut(final ActionEvent actionEvent) {
     final String fileName = getPathFromUser("Open Excel Out File");
     mainPresentationModel.setExcelFileOut(fileName);
-    if (fileName instanceof String && StringUtils.isNotBlank(fileName)) {
+    if (fileName != null && StringUtils.isNotBlank(fileName)) {
       try {
         final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
         articleServiceOut.setWorkbook(wb);
@@ -189,21 +197,51 @@ public class MainFrameController implements Initializable {
   }
 
   void inSheetSelected(ObservableValue observable, Object oldValue, Object newValue) {
-    LOG.warn("selected in sheetname: {}", newValue);
+    LOG.debug("selected in sheetname: {}", newValue);
     if (newValue instanceof String && StringUtils.isNotBlank((String) newValue)) {
       this.articleServiceIn.setSelectedSheetName((String) newValue);
-      this.mainPresentationModel
-          .setInColumns(FXCollections.observableArrayList(this.articleServiceIn.getColumnsName()));
+      List<String> cols = this.articleServiceIn.getColumnsName();
+      if (LOG.isTraceEnabled()) {
+        StringJoiner sj = new StringJoiner(", ", "Columns name: ", ".");
+        for (String c : cols) {
+          sj.add(c);
+        }
+        LOG.trace(sj.toString());
+      }
+      ObservableList<String> obs = FXCollections.observableArrayList(cols);
+      this.mainPresentationModel.setInColumns(obs);
     }
   }
 
   void outSheetSelected(ObservableValue observable, Object oldValue, Object newValue) {
-    LOG.warn("selected out sheetname: {}", newValue);
+    LOG.debug("selected out sheetname: {}", newValue);
     if (newValue instanceof String && StringUtils.isNotBlank((String) newValue)) {
       this.articleServiceOut.setSelectedSheetName((String) newValue);
       this.mainPresentationModel
           .setOutColumns(FXCollections.observableArrayList(this.articleServiceOut.getColumnsName()));
     }
+  }
+
+  void inColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
+    LOG.debug("selected in column names: {}", newValue);
+  }
+
+  void outColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
+    LOG.debug("selected out column name: {}", newValue);
+  }
+
+  void stockColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
+    LOG.debug("selected stock column name: {}", newValue);
+  }
+
+  void compute(final ActionEvent actionEvent) {
+    LOG.debug("compute");
+    // TODO implémenter la méthode
+  }
+
+  void save(final ActionEvent actionEvent) {
+    LOG.debug("save");
+    // TODO implémenter la méthode
   }
 
   public void setStage(final Stage stage) {
