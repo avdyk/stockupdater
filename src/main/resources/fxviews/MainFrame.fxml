@@ -6,38 +6,50 @@
 
 <StackPane fx:id="root" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController">
-  <children>
-    <GridPane>
-      <columnConstraints>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0"/>
-      </columnConstraints>
-      <children>
-        <Label text="Excel file in"/>
-        <Button fx:id="excelFileInButton" mnemonicParsing="false" text="Open file" GridPane.columnIndex="2"/>
-        <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1"/>
-        <Label text="In Sheet" GridPane.rowIndex="1"/>
-        <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-        <Label text="In columns" GridPane.rowIndex="2"/>
-        <ChoiceBox fx:id="inColumnsChoiceBox" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-        <Label text="Stock Column" GridPane.rowIndex="3"/>
-        <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-        <Label text="Excel file out" GridPane.rowIndex="4"/>
-        <TextField fx:id="excelFileOutTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-        <Button fx:id="excelFileOutButton" mnemonicParsing="false" text="Open file" GridPane.columnIndex="2"
-                GridPane.rowIndex="4"/>
-        <Label text="out sheet" GridPane.rowIndex="5"/>
-        <ComboBox fx:id="outSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-        <Label text="Out column" GridPane.rowIndex="6"/>
-        <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-        <Label text="Update Type" GridPane.rowIndex="7"/>
-        <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
-        <Label text="Stock text file" GridPane.rowIndex="8"/>
-        <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
-        <Button fx:id="stockFileButton" mnemonicParsing="false" text="Open stock text file" GridPane.columnIndex="2"
-                GridPane.rowIndex="8"/>
-      </children>
-    </GridPane>
-  </children>
+  <GridPane>
+    <columnConstraints>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
+      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0"/>
+    </columnConstraints>
+    <rowConstraints>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+      <RowConstraints/>
+    </rowConstraints>
+    <Label text="Excel file in"/>
+    <Button fx:id="excelFileInButton" mnemonicParsing="false" text="Open file" GridPane.columnIndex="2"/>
+    <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1"/>
+    <Label text="In Sheet" GridPane.rowIndex="1"/>
+    <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <Label text="In columns" GridPane.rowIndex="2"/>
+    <ChoiceBox fx:id="inColumnsChoiceBox" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+    <Label text="Stock Column" GridPane.rowIndex="3"/>
+    <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+    <Label text="Excel file out" GridPane.rowIndex="4"/>
+    <TextField fx:id="excelFileOutTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+    <Button fx:id="excelFileOutButton" mnemonicParsing="false" text="Open file" GridPane.columnIndex="2"
+            GridPane.rowIndex="4"/>
+    <Label text="out sheet" GridPane.rowIndex="5"/>
+    <ComboBox fx:id="outSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+    <Label text="Out column" GridPane.rowIndex="6"/>
+    <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+    <Label text="Update Type" GridPane.rowIndex="7"/>
+    <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+    <Label text="Stock text file" GridPane.rowIndex="8"/>
+    <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+    <Button fx:id="stockFileButton" mnemonicParsing="false" text="Open stock text file" GridPane.columnIndex="2"
+            GridPane.rowIndex="8"/>
+    <HBox alignment="CENTER" GridPane.columnIndex="1" GridPane.rowIndex="9">
+      <Button fx:id="computeButton" mnemonicParsing="false" text="Compute"/>
+      <Button fx:id="saveButton" mnemonicParsing="false" text="Save"/>
+    </HBox>
+  </GridPane>
 </StackPane>
