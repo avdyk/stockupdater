@@ -25,10 +25,10 @@ import java.io.StringWriter;
  */
 public class StockUpdater extends Application {
 
-  private static final Logger logger = LoggerFactory.getLogger(StockUpdater.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StockUpdater.class);
 
   public static void main(String[] args) {
-    logger.info("StockUpdater starting...");
+    LOG.info("StockUpdater starting...");
     launch(args);
   }
 
@@ -49,7 +49,7 @@ public class StockUpdater extends Application {
 
   private void exceptionHandler(final Thread t, final Throwable e) {
     // FIXME update the text in the dialog
-    logger.error("Oups... un problème dans le thread {}: {}", t.getName(), e.getMessage(), e);
+    LOG.error("Oups... un problème dans le thread {}: {}", t.getName(), e.getMessage(), e);
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle("Exception Dialog");
     alert.setHeaderText("Look, an Exception Dialog");
