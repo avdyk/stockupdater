@@ -132,7 +132,7 @@ public class MainFrameController implements Initializable {
     outColumnsComboBox.setItems(mainPresentationModel.outColumnsProperty());
     outColumnsComboBox.valueProperty().addListener(this::outColumnSelected);
     // - selected out column of excel out file
-    outColumnsComboBox.valueProperty().bind(mainPresentationModel.outProperty());
+    outColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.outProperty());
     // TODO updateTypeComboBox bindings
     updateTypeComboBox.setItems(FXCollections.observableArrayList(UpdateType.values()));
     // - stock file field
