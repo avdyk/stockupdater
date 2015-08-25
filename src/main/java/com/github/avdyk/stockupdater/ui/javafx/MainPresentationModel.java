@@ -1,5 +1,6 @@
 package com.github.avdyk.stockupdater.ui.javafx;
 
+import com.github.avdyk.stockupdater.UpdateType;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class MainPresentationModel {
   private StringProperty excelFileIn = new SimpleStringProperty();
   private StringProperty excelFileOut = new SimpleStringProperty();
   private StringProperty stockFile = new SimpleStringProperty();
-  // FIXME BINDINGS private UpdateType updateType;
+  private ObjectProperty<UpdateType> updateType = new SimpleObjectProperty<>();
   private ListProperty<String> excelFileInSheetNames = new SimpleListProperty<>();
   private StringProperty sheetNameIn = new SimpleStringProperty();
   private ListProperty<String> inColumns = new SimpleListProperty<>();
@@ -187,6 +188,18 @@ public class MainPresentationModel {
 
   public void setExcelFileOutSheetNames(ObservableList<String> excelFileOutSheetNames) {
     this.excelFileOutSheetNames.set(excelFileOutSheetNames);
+  }
+
+  public UpdateType getUpdateType() {
+    return updateType.get();
+  }
+
+  public ObjectProperty<UpdateType> updateTypeProperty() {
+    return updateType;
+  }
+
+  public void setUpdateType(UpdateType updateType) {
+    this.updateType.set(updateType);
   }
 
   public boolean getComputable() {

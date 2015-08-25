@@ -25,7 +25,7 @@ public class ConsoleApp {
     final Map<Long, Long> stock = stockCompute.stockStream(Files.lines(conf.getStockFile()));
     stock.forEach((k, v) -> LOG.info("code: {}; stock: {}", k, v));
     final ArticleService articleService = ctx.getBean(ArticleServiceImpl.class);
-    articleService.updateStock(conf.getUpdateType(), stock);
+    //articleService.updateStock(conf.getUpdateType(), stock);
     // -- la suite
 		LOG.info("Application Stock Updater stop");
 	}

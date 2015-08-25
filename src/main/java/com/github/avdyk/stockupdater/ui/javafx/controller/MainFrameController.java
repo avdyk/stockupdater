@@ -2,6 +2,7 @@ package com.github.avdyk.stockupdater.ui.javafx.controller;
 
 import com.github.avdyk.stockupdater.ArticleService;
 import com.github.avdyk.stockupdater.StockCompute;
+import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
@@ -26,11 +27,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -51,9 +56,8 @@ public class MainFrameController implements Initializable {
   @Autowired
   private MainPresentationModel mainPresentationModel;
   @Autowired
-  private ArticleService articleServiceIn;
-  @Autowired
-  private ArticleService articleServiceOut;
+  private StockService stockService;
+
   private Stage stage;
   @FXML
   private StackPane root;
@@ -85,6 +89,7 @@ public class MainFrameController implements Initializable {
   private Button computeButton;
   @FXML
   private Button saveButton;
+  private Map<Long, Long> stockComputed;
 
   public Parent getView() {
     return root;
@@ -133,8 +138,9 @@ public class MainFrameController implements Initializable {
     outColumnsComboBox.valueProperty().addListener(this::outColumnSelected);
     // - selected out column of excel out file
     outColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.outProperty());
-    // TODO updateTypeComboBox bindings
+    // - updateTypeComboBox bindings
     updateTypeComboBox.setItems(FXCollections.observableArrayList(UpdateType.values()));
+    updateTypeComboBox.valueProperty().bindBidirectional(mainPresentationModel.updateTypeProperty());
     // - stock file field
     stockFileTextField.textProperty().bind(mainPresentationModel.stockFileProperty());
     // TODO bindings to button save and button compute enable
@@ -146,9 +152,11 @@ public class MainFrameController implements Initializable {
     if (fileName != null && StringUtils.isNotBlank(fileName)) {
       try {
         final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
-        articleServiceIn.setWorkbook(wb);
+        this.stockService.getInService().setWorkbook(wb);
+        this.stockService.getStockService().setWorkbook(wb);
         mainPresentationModel
-            .setExcelFileInSheetNames(FXCollections.observableArrayList(articleServiceIn.getSheetsName()));
+            .setExcelFileInSheetNames(
+                FXCollections.observableArrayList(this.stockService.getInService().getSheetsName()));
       } catch (IOException e) {
         LOG.warn("File not found", e);
       }
@@ -162,9 +170,10 @@ public class MainFrameController implements Initializable {
     if (fileName != null && StringUtils.isNotBlank(fileName)) {
       try {
         final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
-        articleServiceOut.setWorkbook(wb);
+        this.stockService.getOutService().setWorkbook(wb);
         mainPresentationModel
-            .setExcelFileOutSheetNames(FXCollections.observableArrayList(articleServiceOut.getSheetsName()));
+            .setExcelFileOutSheetNames(
+                FXCollections.observableArrayList(this.stockService.getOutService().getSheetsName()));
       } catch (IOException e) {
         LOG.warn("File not found", e);
       }
@@ -175,13 +184,13 @@ public class MainFrameController implements Initializable {
   void chooseStockTextFile(final ActionEvent actionEvent) {
     final String path = getPathFromUser("Open Stock Text File");
     mainPresentationModel.setStockFile(path);
-    // FIXME le code suivant doit passer dans le business controlleur
     try {
-      Map<Long, Long> stock = stockCompute.stockStream(Files.lines(Paths.get(mainPresentationModel.getStockFile())));
+      stockComputed =
+          stockCompute.stockStream(Files.lines(Paths.get(mainPresentationModel.getStockFile())));
       if (LOG.isDebugEnabled()) {
         LOG.debug("Résultat du stock");
-        for (final Long barCode : stock.keySet()) {
-          LOG.debug("barCode: {}; stock: {}", barCode, stock.get(barCode));
+        for (final Long barCode : stockComputed.keySet()) {
+          LOG.debug("barCode: {}; stock: {}", barCode, stockComputed.get(barCode));
         }
       }
     } catch (IOException e) {
@@ -199,8 +208,10 @@ public class MainFrameController implements Initializable {
   void inSheetSelected(ObservableValue observable, Object oldValue, Object newValue) {
     LOG.debug("selected in sheetname: {}", newValue);
     if (newValue instanceof String && StringUtils.isNotBlank((String) newValue)) {
-      this.articleServiceIn.setSelectedSheetName((String) newValue);
-      List<String> cols = this.articleServiceIn.getColumnsName();
+      final String sheetName = (String) newValue;
+      this.stockService.getInService().setSelectedSheetName(sheetName);
+      this.stockService.getStockService().setSelectedSheetName(sheetName);
+      List<String> cols = this.stockService.getInService().getColumnsName();
       if (LOG.isTraceEnabled()) {
         StringJoiner sj = new StringJoiner(", ", "Columns name: ", ".");
         for (String c : cols) {
@@ -216,14 +227,15 @@ public class MainFrameController implements Initializable {
   void outSheetSelected(ObservableValue observable, Object oldValue, Object newValue) {
     LOG.debug("selected out sheetname: {}", newValue);
     if (newValue instanceof String && StringUtils.isNotBlank((String) newValue)) {
-      this.articleServiceOut.setSelectedSheetName((String) newValue);
+      this.stockService.getOutService().setSelectedSheetName((String) newValue);
       this.mainPresentationModel
-          .setOutColumns(FXCollections.observableArrayList(this.articleServiceOut.getColumnsName()));
+          .setOutColumns(FXCollections.observableArrayList(this.stockService.getOutService().getColumnsName()));
     }
   }
 
   void inColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
-    LOG.debug("selected in column names: {}", newValue);
+    LOG.debug("selected in column names: {}; in service: {}", newValue,
+        this.stockService.getInService().getSelectedColumnName());
   }
 
   void outColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
@@ -236,12 +248,23 @@ public class MainFrameController implements Initializable {
 
   void compute(final ActionEvent actionEvent) {
     LOG.debug("compute");
-    // TODO implémenter la méthode
+    stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed);
+    // TODO mettre un feed back dans l'interface pour afficher les id's du stock qui n'ont pas été trouvés
+
   }
 
   void save(final ActionEvent actionEvent) {
     LOG.debug("save");
-    // TODO implémenter la méthode
+    final String filename = this.mainPresentationModel.getExcelFileOut();
+    try {
+      OutputStream outStream = Files.newOutputStream(
+          Paths.get(filename), StandardOpenOption.WRITE);
+    stockService.writeExcelWorkbook(outStream);
+      outStream.flush();
+      outStream.close();
+    } catch (IOException e) {
+      LOG.error(String.format("Problem writing file %s", filename));
+    }
   }
 
   public void setStage(final Stage stage) {

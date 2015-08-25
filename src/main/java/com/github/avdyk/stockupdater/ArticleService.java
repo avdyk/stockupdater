@@ -5,8 +5,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Services de l'application.
@@ -16,7 +18,6 @@ import java.util.Map;
  */
 public interface ArticleService {
 
-  // TODO new design
   void setWorkbook(final XSSFWorkbook workbook);
 
   XSSFWorkbook getWorkbook();
@@ -27,62 +28,14 @@ public interface ArticleService {
 
   String getSelectedSheetName();
 
-  /**
-   * Pas nécessaire?..
-   * @return
-   * @deprecated nécessaire?
-   */
   XSSFSheet getSelectedSheet();
 
   List<String> getColumnsName();
 
-  // TODO old design
-  @Deprecated
-  List<String> getInSheetNames();
+  void setSelectedColumn(final String columnName);
 
-  @Deprecated
-  void setInSelectedSheet(String selectedSheetName);
+  String getSelectedColumnName();
 
-  @Deprecated
-  XSSFSheet getInSelectedSheet();
+  Map<Long, Set<Integer>> getIdsWithLineNumbersIndexes();
 
-  @Deprecated
-  void setOutSelectedSheet(String selectedSheetName);
-
-  @Deprecated
-  XSSFSheet getOutSelectedSheet();
-
-  @Deprecated
-  List<String> getInColumnNames();
-
-  @Deprecated
-  String getStock();
-
-  @Deprecated
-  void setStock(String stock);
-
-  @Deprecated
-  String getOut();
-
-  @Deprecated
-  void setOut(String out);
-
-  @Deprecated
-  List<String> getIn();
-
-  @Deprecated
-  void setIn(List<String> in);
-
-  @Deprecated
-  void updateStock(UpdateType updateType,
-                   Map<Long, Long> stock);
-
-  /**
-   * Save the sheet on the stream. The stream will not be closed!
-   *
-   * @param stream the stream.
-   * @throws java.io.IOException if a problem with the stream.
-   */
-  @Deprecated
-  void writeExcelWorkbook(OutputStream stream) throws IOException;
 }

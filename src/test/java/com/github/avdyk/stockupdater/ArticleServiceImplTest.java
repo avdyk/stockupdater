@@ -45,6 +45,7 @@ public class ArticleServiceImplTest {
     STOCK_08702.put(8702L, 5L);
   }
 
+/*
   private void initArticleService() {
     service.setInSelectedSheet(MAIN_SHEET);
     service.setIn(IN_COLUMNS);
@@ -166,4 +167,5 @@ public class ArticleServiceImplTest {
     Assert.assertEquals(5, (int) cell60.getNumericCellValue());
     Assert.assertEquals(5, (int) cell71.getNumericCellValue());
   }
+*/
 }
