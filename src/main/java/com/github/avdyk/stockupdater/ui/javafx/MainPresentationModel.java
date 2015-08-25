@@ -1,9 +1,6 @@
 package com.github.avdyk.stockupdater.ui.javafx;
 
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import org.springframework.stereotype.Component;
 
@@ -24,12 +21,15 @@ public class MainPresentationModel {
   private ListProperty<String> excelFileInSheetNames = new SimpleListProperty<>();
   private StringProperty sheetNameIn = new SimpleStringProperty();
   private ListProperty<String> inColumns = new SimpleListProperty<>();
-  private ListProperty<String> in = new SimpleListProperty<>();
+//  private ListProperty<String> in = new SimpleListProperty<>();
+  private StringProperty in = new SimpleStringProperty();
   private StringProperty stockColumn = new SimpleStringProperty();
   private ListProperty<String> excelFileOutSheetNames = new SimpleListProperty<>();
   private StringProperty sheetNameOut = new SimpleStringProperty();
   private ListProperty<String> outColumns = new SimpleListProperty<>();
   private StringProperty out = new SimpleStringProperty();
+  private BooleanProperty computable = new SimpleBooleanProperty();
+  private BooleanProperty saveable = new SimpleBooleanProperty();
 
   public String getExcelFileIn() {
     return excelFileIn.get();
@@ -115,6 +115,7 @@ public class MainPresentationModel {
     this.out.set(out);
   }
 
+/*
   public ObservableList<String> getIn() {
     return in.get();
   }
@@ -124,6 +125,19 @@ public class MainPresentationModel {
   }
 
   public void setIn(ObservableList<String> in) {
+    this.in.set(in);
+  }
+*/
+
+  public String getIn() {
+    return in.get();
+  }
+
+  public StringProperty inProperty() {
+    return in;
+  }
+
+  public void setIn(String in) {
     this.in.set(in);
   }
 
@@ -173,5 +187,29 @@ public class MainPresentationModel {
 
   public void setExcelFileOutSheetNames(ObservableList<String> excelFileOutSheetNames) {
     this.excelFileOutSheetNames.set(excelFileOutSheetNames);
+  }
+
+  public boolean getComputable() {
+    return computable.get();
+  }
+
+  public BooleanProperty computableProperty() {
+    return computable;
+  }
+
+  public void setComputable(boolean computable) {
+    this.computable.set(computable);
+  }
+
+  public boolean getSaveable() {
+    return saveable.get();
+  }
+
+  public BooleanProperty saveableProperty() {
+    return saveable;
+  }
+
+  public void setSaveable(boolean saveable) {
+    this.saveable.set(saveable);
   }
 }
