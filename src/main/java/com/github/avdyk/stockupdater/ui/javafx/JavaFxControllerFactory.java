@@ -2,8 +2,6 @@ package com.github.avdyk.stockupdater.ui.javafx;
 
 import com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController;
 import javafx.fxml.FXMLLoader;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -21,29 +19,29 @@ import java.util.ResourceBundle;
 public class JavaFxControllerFactory {
 
   public static final String MAIN_FRAME = "/fxviews/MainFrame.fxml";
-
-  @Autowired
-  MessageSource messageSource;
+  public static final ResourceBundle MAIN_FRAME_RESOURCE_BUNDLE = ResourceBundle.getBundle("i18n.ui");
 
   @Bean
   public MainFrameController mainFrameController() throws IOException {
-    return loadController(MAIN_FRAME);
+    return loadController(MAIN_FRAME, MAIN_FRAME_RESOURCE_BUNDLE);
   }
 
   /**
    * Chargement d'un controller FXMLLoader en fonction du fichier FXML passé en paramètre.
-   * @param url l'url du fichier FXML.
+   *
+   * @param url    l'url du fichier FXML.
+   * @param bundle le resource bundle pour cette vue
    * @return le FXML construit avec le fichier FXML passé en paramètre
    * @throws IOException si le fichier FXML n'est pas trouvé ou illisible.
    * @see javafx.fxml.FXMLLoader
    */
-  private <E> E loadController(String url) throws IOException {
+  private <E> E loadController(final String url, final ResourceBundle bundle) throws IOException {
     InputStream fxmlStream = null;
     FXMLLoader loader = null;
     try {
       fxmlStream = getClass().getResourceAsStream(url);
       loader = new FXMLLoader();
-      loader.setResources(ResourceBundle.getBundle("i18n.ui"));
+      loader.setResources(bundle);
       loader.load(fxmlStream);
     } finally {
       if (fxmlStream != null) {
