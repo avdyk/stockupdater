@@ -2,11 +2,14 @@ package com.github.avdyk.stockupdater.ui.javafx;
 
 import com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController;
 import javafx.fxml.FXMLLoader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ResourceBundle;
 
 /**
  * JavaFx controller factory.
@@ -18,6 +21,9 @@ import java.io.InputStream;
 public class JavaFxControllerFactory {
 
   public static final String MAIN_FRAME = "/fxviews/MainFrame.fxml";
+
+  @Autowired
+  MessageSource messageSource;
 
   @Bean
   public MainFrameController mainFrameController() throws IOException {
@@ -37,6 +43,7 @@ public class JavaFxControllerFactory {
     try {
       fxmlStream = getClass().getResourceAsStream(url);
       loader = new FXMLLoader();
+      loader.setResources(ResourceBundle.getBundle("i18n.ui"));
       loader.load(fxmlStream);
     } finally {
       if (fxmlStream != null) {

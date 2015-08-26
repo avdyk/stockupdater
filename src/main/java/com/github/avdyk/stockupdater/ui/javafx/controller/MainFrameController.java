@@ -1,6 +1,5 @@
 package com.github.avdyk.stockupdater.ui.javafx.controller;
 
-import com.github.avdyk.stockupdater.ArticleService;
 import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
@@ -25,21 +24,17 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 
 import javax.annotation.PostConstruct;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Controller for the main frame.
@@ -57,6 +52,10 @@ public class MainFrameController implements Initializable {
   private MainPresentationModel mainPresentationModel;
   @Autowired
   private StockService stockService;
+/*
+  @Autowired
+  private MessageSource messageSource;
+*/
 
   private Stage stage;
   @FXML
@@ -89,6 +88,11 @@ public class MainFrameController implements Initializable {
   private Button computeButton;
   @FXML
   private Button saveButton;
+  @FXML
+  private TextField outputLog;
+  @FXML
+  private Button clearButton;
+
   private Map<Long, Long> stockComputed;
 
   public Parent getView() {
@@ -98,11 +102,16 @@ public class MainFrameController implements Initializable {
   @Override
   public void initialize(URL location, ResourceBundle resources) {
     // actions
+    // TODO put onAction="#" in fxml
+/*
+    LOG.info(messageSource.getMessage("ui.in.excel.file.label", null, Locale.getDefault()));
+*/
     excelFileInButton.setOnAction(this::chooseExcelIn);
     excelFileOutButton.setOnAction(this::chooseExcelOut);
     stockFileButton.setOnAction(this::chooseStockTextFile);
     computeButton.setOnAction(this::compute);
     saveButton.setOnAction(this::save);
+    clearButton.setOnAction(this::clear);
   }
 
   @SuppressWarnings("unused")
@@ -265,6 +274,11 @@ public class MainFrameController implements Initializable {
     } catch (IOException e) {
       LOG.error(String.format("Problem writing file %s", filename));
     }
+  }
+
+  void clear(final ActionEvent actionEvent) {
+    LOG.debug("clear");
+    outputLog.setText("");
   }
 
   public void setStage(final Stage stage) {
