@@ -4,6 +4,7 @@ import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
+import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -23,7 +24,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -33,7 +33,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.StringJoiner;
 
 /**
  * Controller for the main frame.
@@ -51,10 +54,6 @@ public class MainFrameController implements Initializable {
   private MainPresentationModel mainPresentationModel;
   @Autowired
   private StockService stockService;
-/*
-  @Autowired
-  private MessageSource messageSource;
-*/
 
   private Stage stage;
   @FXML
@@ -88,11 +87,7 @@ public class MainFrameController implements Initializable {
 
   @Override
   public void initialize(URL location, ResourceBundle resources) {
-    // actions
-    // TODO put onAction="#" in fxml
-/*
-    LOG.info(messageSource.getMessage("ui.in.excel.file.label", null, Locale.getDefault()));
-*/
+    // nothing to do at the moment
   }
 
   @SuppressWarnings("unused")
@@ -137,8 +132,10 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused")
   void chooseExcelIn(final ActionEvent actionEvent) {
-    final String fileName = getPathFromUser("Open Excel In File");
+    final String fileName = getPathFromUser(JavaFxControllerFactory
+        .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.in.excel.file.dialog.title"));
     mainPresentationModel.setExcelFileIn(fileName);
     if (fileName != null && StringUtils.isNotBlank(fileName)) {
       try {
@@ -156,8 +153,10 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused")
   void chooseExcelOut(final ActionEvent actionEvent) {
-    final String fileName = getPathFromUser("Open Excel Out File");
+    final String fileName = getPathFromUser(JavaFxControllerFactory
+        .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.out.excel.file.dialog.title"));
     mainPresentationModel.setExcelFileOut(fileName);
     if (fileName != null && StringUtils.isNotBlank(fileName)) {
       try {
@@ -174,8 +173,10 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused")
   void chooseStockTextFile(final ActionEvent actionEvent) {
-    final String path = getPathFromUser("Open Stock Text File");
+    final String path = getPathFromUser(JavaFxControllerFactory
+        .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.stock.file.dialog.title"));
     mainPresentationModel.setStockFile(path);
     try {
       stockComputed =
@@ -254,7 +255,7 @@ public class MainFrameController implements Initializable {
     try {
       OutputStream outStream = Files.newOutputStream(
           Paths.get(filename), StandardOpenOption.WRITE);
-    stockService.writeExcelWorkbook(outStream);
+      stockService.writeExcelWorkbook(outStream);
       outStream.flush();
       outStream.close();
     } catch (IOException e) {
