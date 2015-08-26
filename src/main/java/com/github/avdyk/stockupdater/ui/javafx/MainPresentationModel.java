@@ -1,11 +1,16 @@
 package com.github.avdyk.stockupdater.ui.javafx;
 
 import com.github.avdyk.stockupdater.UpdateType;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.ObservableList;
 import org.springframework.stereotype.Component;
-
-import java.nio.file.Path;
 
 /**
  * Represent the state of the view.
@@ -31,6 +36,7 @@ public class MainPresentationModel {
   private StringProperty out = new SimpleStringProperty();
   private BooleanProperty computable = new SimpleBooleanProperty();
   private BooleanProperty saveable = new SimpleBooleanProperty();
+  private StringProperty logOutput = new SimpleStringProperty();
 
   public String getExcelFileIn() {
     return excelFileIn.get();
@@ -200,6 +206,18 @@ public class MainPresentationModel {
 
   public void setUpdateType(UpdateType updateType) {
     this.updateType.set(updateType);
+  }
+
+  public String getLogOutput() {
+    return logOutput.get();
+  }
+
+  public StringProperty logOutputProperty() {
+    return logOutput;
+  }
+
+  public void setLogOutput(String logOutput) {
+    this.logOutput.set(logOutput);
   }
 
   public boolean getComputable() {

@@ -1,6 +1,10 @@
 package com.github.avdyk.stockupdater.ui.javafx;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
+import com.github.avdyk.stockupdater.ui.StringAppender;
 import com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -16,6 +20,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Iterator;
 
 /**
  * Classe de lancement de l'application JavaFX.
@@ -38,6 +43,18 @@ public class StockUpdater extends Application {
         = new AnnotationConfigApplicationContext(ConfImpl.class);
     Thread.setDefaultUncaughtExceptionHandler(this::exceptionHandler);
     MainFrameController controller = context.getBean(MainFrameController.class);
+    // mise en place des logs
+    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    StringAppender stringAppender = (StringAppender) ((ch.qos.logback.classic.Logger) LOG).getAppender("logOutput");
+    if (stringAppender == null) {
+      ch.qos.logback.classic.Logger chL = ((ch.qos.logback.classic.Logger) LOG);
+      Iterator<Appender<ILoggingEvent>> iter = chL.iteratorForAppenders ();
+      while (iter.hasNext()) {
+        Appender<ILoggingEvent> app = iter.next();
+        LOG.info("Appender: {} ({})", app.getName(), app.getClass().getName());
+      }
+    }
+    controller.setAppender(stringAppender);
     controller.setStage(primaryStage);
     ConfImpl conf = context.getBean(ConfImpl.class);
     Scene scene = new Scene(controller.getView(), 600, 550);

@@ -4,6 +4,7 @@ import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
+import com.github.avdyk.stockupdater.ui.StringAppender;
 import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import javafx.beans.value.ObservableValue;
@@ -77,9 +78,10 @@ public class MainFrameController implements Initializable {
   @FXML
   private TextField stockFileTextField;
   @FXML
-  private TextField outputLog;
+  private TextField logOutput;
 
   private Map<Long, Long> stockComputed;
+  private StringAppender appender;
 
   public Parent getView() {
     return root;
@@ -128,6 +130,9 @@ public class MainFrameController implements Initializable {
     updateTypeComboBox.valueProperty().bindBidirectional(mainPresentationModel.updateTypeProperty());
     // - stock file field
     stockFileTextField.textProperty().bind(mainPresentationModel.stockFileProperty());
+    logOutput.textProperty().bind(mainPresentationModel.logOutputProperty());
+    // registrer the appender
+
     // TODO bindings to button save and button compute enable
   }
 
@@ -266,7 +271,7 @@ public class MainFrameController implements Initializable {
   @FXML
   void clear(final ActionEvent actionEvent) {
     LOG.debug("clear");
-    outputLog.setText("");
+    mainPresentationModel.setLogOutput("");
   }
 
   public void setStage(final Stage stage) {
@@ -275,5 +280,12 @@ public class MainFrameController implements Initializable {
 
   public Stage getStage() {
     return stage;
+  }
+
+  public void setAppender(final StringAppender appender) {
+    this.appender = appender;
+    if (appender != null && mainPresentationModel != null) {
+      appender.setPresentationModel(mainPresentationModel);
+    }
   }
 }

@@ -11,6 +11,13 @@
       </pattern>
     </encoder>
   </appender>
+  <!-- Ne rien changer à cet appender -->
+  <appender name="logOutput" class="com.github.avdyk.stockupdater.ui.StringAppender">
+    <encoder>
+      <pattern>%date %level %logger %msg%n
+      </pattern>
+    </encoder>
+  </appender>
 
   <logger name="org.springframework" level="warn" />
   <logger name="com.github.avdyk.stockupdater" level="info" />
@@ -19,5 +26,7 @@
   <root level="info">
     <!--<appender-ref ref="FILE"/>-->
     <appender-ref ref="STDOUT" />
+    <appender-ref ref="logOutput">
+    </appender-ref>
   </root>
 </configuration>

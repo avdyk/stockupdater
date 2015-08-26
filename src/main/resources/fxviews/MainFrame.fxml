@@ -60,7 +60,7 @@
       <Button fx:id="computeButton" mnemonicParsing="false" text="%ui.compute.button" onAction="#compute"/>
       <Button fx:id="saveButton" mnemonicParsing="false" text="%ui.save.button" onAction="#save"/>
     </HBox>
-    <TextField fx:id="outputLog" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
+    <TextField fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
                GridPane.rowIndex="10" GridPane.rowSpan="5" />
     <Button fx:id="clearButton" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.rowIndex="15"
         onAction="#clear"  GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
