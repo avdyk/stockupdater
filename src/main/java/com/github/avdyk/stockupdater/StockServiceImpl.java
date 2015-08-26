@@ -72,17 +72,22 @@ public class StockServiceImpl implements StockService {
           if (cell == null) {
             cell = r.createCell(outIndex);
           }
+          final double newValue;
           switch (updateType) {
             case UPDATE:
-              cell.setCellValue(quantity);
+              newValue = quantity;
               break;
             case ADD:
-              cell.setCellValue(originalStock + quantity);
+              newValue = originalStock + quantity;
               break;
             case SUBSTRACT:
-              cell.setCellValue(originalStock - quantity);
+              newValue = originalStock - quantity;
               break;
+            default:
+              newValue = -1;
           }
+          cell.setCellValue(newValue);
+          LOG.info("Update stock for line {}: from {} to {}", row, originalStock, newValue);
         });
   }
 
