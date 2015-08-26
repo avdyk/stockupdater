@@ -17,6 +17,7 @@ import org.springframework.core.env.Environment;
 import javax.annotation.PostConstruct;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 @Configuration
 @PropertySources({@PropertySource("classpath:stockupdater.properties")})
@@ -89,7 +90,7 @@ public class ConfImpl {
     if (instr != null) {
       this.setIn(instr.split(","));
     }
-    LOG.debug("Excel in column names: {}", in);
+    LOG.debug("Excel in column names: {}", Arrays.toString(in));
     // STOCK_FILE
     final String stFstr = env.getProperty(STOCK_FILE);
     if (stFstr != null) {
