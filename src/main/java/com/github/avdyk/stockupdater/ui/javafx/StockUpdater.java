@@ -40,7 +40,7 @@ public class StockUpdater extends Application {
     MainFrameController controller = context.getBean(MainFrameController.class);
     controller.setStage(primaryStage);
     ConfImpl conf = context.getBean(ConfImpl.class);
-    Scene scene = new Scene(controller.getView(), 450, 300);
+    Scene scene = new Scene(controller.getView(), 600, 550);
     scene.getStylesheets().add("/css/stockupdater.css");
     primaryStage.setScene(scene);
     primaryStage.setTitle(String.format("%s - %s", conf.getApplicationName(), conf.getVersion()));
