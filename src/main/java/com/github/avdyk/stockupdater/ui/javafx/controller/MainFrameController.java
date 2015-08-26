@@ -12,7 +12,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -61,8 +60,6 @@ public class MainFrameController implements Initializable {
   @FXML
   private StackPane root;
   @FXML
-  private Button excelFileInButton;
-  @FXML
   private TextField excelFileInTextField;
   @FXML
   private ComboBox<String> inSheetComboBox;
@@ -73,8 +70,6 @@ public class MainFrameController implements Initializable {
   @FXML
   private TextField excelFileOutTextField;
   @FXML
-  private Button excelFileOutButton;
-  @FXML
   private ComboBox<String> outSheetComboBox;
   @FXML
   private ComboBox<String> outColumnsComboBox;
@@ -83,15 +78,7 @@ public class MainFrameController implements Initializable {
   @FXML
   private TextField stockFileTextField;
   @FXML
-  private Button stockFileButton;
-  @FXML
-  private Button computeButton;
-  @FXML
-  private Button saveButton;
-  @FXML
   private TextField outputLog;
-  @FXML
-  private Button clearButton;
 
   private Map<Long, Long> stockComputed;
 
@@ -106,12 +93,6 @@ public class MainFrameController implements Initializable {
 /*
     LOG.info(messageSource.getMessage("ui.in.excel.file.label", null, Locale.getDefault()));
 */
-    excelFileInButton.setOnAction(this::chooseExcelIn);
-    excelFileOutButton.setOnAction(this::chooseExcelOut);
-    stockFileButton.setOnAction(this::chooseStockTextFile);
-    computeButton.setOnAction(this::compute);
-    saveButton.setOnAction(this::save);
-    clearButton.setOnAction(this::clear);
   }
 
   @SuppressWarnings("unused")
@@ -155,6 +136,7 @@ public class MainFrameController implements Initializable {
     // TODO bindings to button save and button compute enable
   }
 
+  @FXML
   void chooseExcelIn(final ActionEvent actionEvent) {
     final String fileName = getPathFromUser("Open Excel In File");
     mainPresentationModel.setExcelFileIn(fileName);
@@ -173,6 +155,7 @@ public class MainFrameController implements Initializable {
 
   }
 
+  @FXML
   void chooseExcelOut(final ActionEvent actionEvent) {
     final String fileName = getPathFromUser("Open Excel Out File");
     mainPresentationModel.setExcelFileOut(fileName);
@@ -190,6 +173,7 @@ public class MainFrameController implements Initializable {
 
   }
 
+  @FXML
   void chooseStockTextFile(final ActionEvent actionEvent) {
     final String path = getPathFromUser("Open Stock Text File");
     mainPresentationModel.setStockFile(path);
@@ -255,6 +239,7 @@ public class MainFrameController implements Initializable {
     LOG.debug("selected stock column name: {}", newValue);
   }
 
+  @FXML
   void compute(final ActionEvent actionEvent) {
     LOG.debug("compute");
     stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed);
@@ -262,6 +247,7 @@ public class MainFrameController implements Initializable {
 
   }
 
+  @FXML
   void save(final ActionEvent actionEvent) {
     LOG.debug("save");
     final String filename = this.mainPresentationModel.getExcelFileOut();
@@ -276,6 +262,7 @@ public class MainFrameController implements Initializable {
     }
   }
 
+  @FXML
   void clear(final ActionEvent actionEvent) {
     LOG.debug("clear");
     outputLog.setText("");
