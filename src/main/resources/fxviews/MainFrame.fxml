@@ -40,29 +40,22 @@
     <ComboBox fx:id="inColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
     <Label text="%ui.stock.excel.column.label" GridPane.rowIndex="3" />
     <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-    <Label text="%ui.out.excel.file.label" GridPane.rowIndex="4" />
-    <TextField fx:id="excelFileOutTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-    <Button fx:id="excelFileOutButton" mnemonicParsing="false" text="%ui.out.excel.file.button"
-            GridPane.columnIndex="2" GridPane.rowIndex="4" onAction="#chooseExcelOut"
-            GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
-    <Label text="%ui.out.excel.sheet.label" GridPane.rowIndex="5" />
-    <ComboBox fx:id="outSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-    <Label text="%ui.out.excel.column.label" GridPane.rowIndex="6" />
-    <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-    <Label text="%ui.update.type.label" GridPane.rowIndex="7" />
-    <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-    <Label text="%ui.stock.file.label" GridPane.rowIndex="8" />
-    <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+    <Label text="%ui.out.excel.column.label" GridPane.rowIndex="4" />
+    <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    <Label text="%ui.update.type.label" GridPane.rowIndex="5" />
+    <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+    <Label text="%ui.stock.file.label" GridPane.rowIndex="6" />
+    <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
     <Button fx:id="stockFileButton" mnemonicParsing="false" text="%ui.stock.file.button" GridPane.columnIndex="2"
-            GridPane.rowIndex="8" onAction="#chooseStockTextFile"
+            GridPane.rowIndex="6" onAction="#chooseStockTextFile"
             GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
-    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9">
+    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7">
       <Button fx:id="computeButton" mnemonicParsing="false" text="%ui.compute.button" onAction="#compute"/>
       <Button fx:id="saveButton" mnemonicParsing="false" text="%ui.save.button" onAction="#save"/>
     </HBox>
     <TextField fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
-               GridPane.rowIndex="10" GridPane.rowSpan="5" />
-    <Button fx:id="clearButton" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.rowIndex="15"
+               GridPane.rowIndex="8" GridPane.rowSpan="5" />
+    <Button fx:id="clearButton" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.rowIndex="13"
         onAction="#clear"  GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
   </GridPane>
 </StackPane>

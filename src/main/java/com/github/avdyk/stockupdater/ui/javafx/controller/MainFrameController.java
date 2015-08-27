@@ -67,10 +67,6 @@ public class MainFrameController implements Initializable {
   @FXML
   private ComboBox<String> stockColumnsComboBox;
   @FXML
-  private TextField excelFileOutTextField;
-  @FXML
-  private ComboBox<String> outSheetComboBox;
-  @FXML
   private ComboBox<String> outColumnsComboBox;
   @FXML
   private ComboBox<UpdateType> updateTypeComboBox;
@@ -112,15 +108,8 @@ public class MainFrameController implements Initializable {
     stockColumnsComboBox.valueProperty().addListener(this::stockColumnSelected);
     // - selected stock column from excel in file
     stockColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.stockColumnProperty());
-    // - excel out file
-    excelFileOutTextField.textProperty().bind(mainPresentationModel.excelFileOutProperty());
-    // - populate sheetnames of excel out file
-    outSheetComboBox.setItems(mainPresentationModel.excelFileOutSheetNamesProperty());
-    outSheetComboBox.valueProperty().addListener(this::outSheetSelected);
-    // - selected sheetname of excel out file
-    outSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameOutProperty());
     // - populate column names from out sheet
-    outColumnsComboBox.setItems(mainPresentationModel.outColumnsProperty());
+    outColumnsComboBox.setItems(mainPresentationModel.inColumnsProperty());
     outColumnsComboBox.valueProperty().addListener(this::outColumnSelected);
     // - selected out column of excel out file
     outColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.outProperty());
@@ -146,29 +135,10 @@ public class MainFrameController implements Initializable {
         final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
         this.stockService.getInService().setWorkbook(wb);
         this.stockService.getStockService().setWorkbook(wb);
+        this.stockService.getOutService().setWorkbook(wb);
         mainPresentationModel
             .setExcelFileInSheetNames(
                 FXCollections.observableArrayList(this.stockService.getInService().getSheetsName()));
-      } catch (IOException e) {
-        LOG.warn("File not found", e);
-      }
-    }
-
-  }
-
-  @FXML
-  @SuppressWarnings("unused")
-  void chooseExcelOut(final ActionEvent actionEvent) {
-    final String fileName = getPathFromUser(JavaFxControllerFactory
-        .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.out.excel.file.dialog.title"));
-    mainPresentationModel.setExcelFileOut(fileName);
-    if (fileName != null && StringUtils.isNotBlank(fileName)) {
-      try {
-        final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
-        this.stockService.getOutService().setWorkbook(wb);
-        mainPresentationModel
-            .setExcelFileOutSheetNames(
-                FXCollections.observableArrayList(this.stockService.getOutService().getSheetsName()));
       } catch (IOException e) {
         LOG.warn("File not found", e);
       }
@@ -209,6 +179,7 @@ public class MainFrameController implements Initializable {
       final String sheetName = (String) newValue;
       this.stockService.getInService().setSelectedSheetName(sheetName);
       this.stockService.getStockService().setSelectedSheetName(sheetName);
+      this.stockService.getOutService().setSelectedSheetName(sheetName);
       List<String> cols = this.stockService.getInService().getColumnsName();
       if (LOG.isTraceEnabled()) {
         StringJoiner sj = new StringJoiner(", ", "Columns name: ", ".");
@@ -219,15 +190,6 @@ public class MainFrameController implements Initializable {
       }
       ObservableList<String> obs = FXCollections.observableArrayList(cols);
       this.mainPresentationModel.setInColumns(obs);
-    }
-  }
-
-  void outSheetSelected(ObservableValue observable, Object oldValue, Object newValue) {
-    LOG.debug("selected out sheetname: {}", newValue);
-    if (newValue instanceof String && StringUtils.isNotBlank((String) newValue)) {
-      this.stockService.getOutService().setSelectedSheetName((String) newValue);
-      this.mainPresentationModel
-          .setOutColumns(FXCollections.observableArrayList(this.stockService.getOutService().getColumnsName()));
     }
   }
 
@@ -255,7 +217,7 @@ public class MainFrameController implements Initializable {
   @FXML
   void save(final ActionEvent actionEvent) {
     LOG.debug("save");
-    final String filename = this.mainPresentationModel.getExcelFileOut();
+    final String filename = this.mainPresentationModel.getExcelFileIn();
     try {
       OutputStream outStream = Files.newOutputStream(
           Paths.get(filename), StandardOpenOption.WRITE);

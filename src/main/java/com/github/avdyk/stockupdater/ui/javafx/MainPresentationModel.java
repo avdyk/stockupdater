@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 public class MainPresentationModel {
 
   private StringProperty excelFileIn = new SimpleStringProperty();
-  private StringProperty excelFileOut = new SimpleStringProperty();
   private StringProperty stockFile = new SimpleStringProperty();
   private ObjectProperty<UpdateType> updateType = new SimpleObjectProperty<>();
   private ListProperty<String> excelFileInSheetNames = new SimpleListProperty<>();
@@ -30,8 +29,6 @@ public class MainPresentationModel {
 //  private ListProperty<String> in = new SimpleListProperty<>();
   private StringProperty in = new SimpleStringProperty();
   private StringProperty stockColumn = new SimpleStringProperty();
-  private ListProperty<String> excelFileOutSheetNames = new SimpleListProperty<>();
-  private StringProperty sheetNameOut = new SimpleStringProperty();
   private ListProperty<String> outColumns = new SimpleListProperty<>();
   private StringProperty out = new SimpleStringProperty();
   private BooleanProperty computable = new SimpleBooleanProperty();
@@ -48,18 +45,6 @@ public class MainPresentationModel {
 
   public void setExcelFileIn(String excelFileIn) {
     this.excelFileIn.set(excelFileIn);
-  }
-
-  public String getExcelFileOut() {
-    return excelFileOut.get();
-  }
-
-  public StringProperty excelFileOutProperty() {
-    return excelFileOut;
-  }
-
-  public void setExcelFileOut(String excelFileOut) {
-    this.excelFileOut.set(excelFileOut);
   }
 
   public String getStockFile() {
@@ -84,18 +69,6 @@ public class MainPresentationModel {
 
   public void setSheetNameIn(String sheetNameIn) {
     this.sheetNameIn.set(sheetNameIn);
-  }
-
-  public String getSheetNameOut() {
-    return sheetNameOut.get();
-  }
-
-  public StringProperty sheetNameOutProperty() {
-    return sheetNameOut;
-  }
-
-  public void setSheetNameOut(String sheetNameOut) {
-    this.sheetNameOut.set(sheetNameOut);
   }
 
   public String getStockColumn() {
@@ -182,18 +155,6 @@ public class MainPresentationModel {
 
   public void setExcelFileInSheetNames(ObservableList<String> excelFileInSheetNames) {
     this.excelFileInSheetNames.set(excelFileInSheetNames);
-  }
-
-  public ObservableList<String> getExcelFileOutSheetNames() {
-    return excelFileOutSheetNames.get();
-  }
-
-  public ListProperty<String> excelFileOutSheetNamesProperty() {
-    return excelFileOutSheetNames;
-  }
-
-  public void setExcelFileOutSheetNames(ObservableList<String> excelFileOutSheetNames) {
-    this.excelFileOutSheetNames.set(excelFileOutSheetNames);
   }
 
   public UpdateType getUpdateType() {
