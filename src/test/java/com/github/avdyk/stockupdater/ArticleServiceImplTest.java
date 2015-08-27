@@ -21,10 +21,13 @@ import java.util.Map;
 /**
  * Tests the article service.
  */
+/*
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
+*/
 public class ArticleServiceImplTest {
 
+/*
   public static final List<String> ALL_IN_COLUMNS = Collections.unmodifiableList(Arrays.asList
       ("s_modele", "s_cle1", "s_cle2", "s_cle3", "s_id", "s_modelen", "s_id_rayon",
           "s_id_famil", "s_id_ssfam", "s_qdispo", "s_qv_1", "s_qv_2", "s_qv_3",
@@ -44,6 +47,7 @@ public class ArticleServiceImplTest {
     STOCK_4950344996964.put(4950344996964L, 1L);
     STOCK_08702.put(8702L, 5L);
   }
+*/
 
 /*
   private void initArticleService() {
