@@ -1,5 +1,6 @@
 package com.github.avdyk.stockupdater;
 
+import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.slf4j.Logger;
@@ -9,8 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Set;
+
+import static java.time.LocalDateTime.*;
 
 /**
  * Service to compute the sotck with the workbooks.
@@ -21,6 +25,7 @@ import java.util.Set;
 public class StockServiceImpl implements StockService {
 
   private static final Logger LOG = LoggerFactory.getLogger(StockServiceImpl.class);
+  private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.S");
 
   @Autowired
   private ArticleService inService;
@@ -33,7 +38,8 @@ public class StockServiceImpl implements StockService {
 
   @Override
   public void updateStock(final UpdateType updateType,
-                          final Map<Long, Long> stock) {
+                          final Map<Long, Long> stock,
+                          final MainPresentationModel presentationModel) {
 
     if (stock == null) {
       throw new NullPointerException("Stock cannot be 'null'");
@@ -44,14 +50,21 @@ public class StockServiceImpl implements StockService {
     if (updateType == null) {
       throw new NullPointerException("Update Type cannot be 'null'");
     }
-    LOG.info("Updating stock");
+    final String titleMsg = String.format("Updating stock at %s",
+        now().format(dateFormatter));
+    LOG.info(titleMsg);
+    // TODO try to use a log appender
+    presentationModel.setLogOutput(titleMsg + ":\n");
     stock.forEach((id, quantity) -> {
       if (id != null && quantity != null) {
         final Set<Integer> rows = inService.getIdsWithLineNumbersIndexes().get(id);
         if (rows != null && !rows.isEmpty()) {
           updateStock(updateType, rows, quantity);
         } else {
-          LOG.warn("Article {} has not been found!", id);
+          final String msg = String.format("Article %d has not been found!", id);
+          LOG.warn(msg);
+          // TODO try to use a log appender
+          presentationModel.setLogOutput(presentationModel.getLogOutput() + msg + "\n");
         }
       }
     });

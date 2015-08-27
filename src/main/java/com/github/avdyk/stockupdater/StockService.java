@@ -1,5 +1,7 @@
 package com.github.avdyk.stockupdater;
 
+import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
@@ -17,7 +19,7 @@ public interface StockService {
 
   ArticleService getOutService();
 
-  void updateStock(UpdateType updateType, Map<Long, Long> stock);
+  void updateStock(UpdateType updateType, Map<Long, Long> stock, MainPresentationModel presentationModel);
 
   /**
    * Save the sheet on the stream. The stream will not be closed!

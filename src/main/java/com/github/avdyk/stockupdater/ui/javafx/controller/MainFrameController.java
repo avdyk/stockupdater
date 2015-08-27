@@ -4,7 +4,6 @@ import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
-import com.github.avdyk.stockupdater.ui.StringAppender;
 import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import javafx.beans.value.ObservableValue;
@@ -14,7 +13,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.*;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
@@ -73,10 +73,9 @@ public class MainFrameController implements Initializable {
   @FXML
   private TextField stockFileTextField;
   @FXML
-  private TextField logOutput;
+  private TextArea logOutput;
 
   private Map<Long, Long> stockComputed;
-  private StringAppender appender;
 
   public Parent getView() {
     return root;
@@ -209,8 +208,7 @@ public class MainFrameController implements Initializable {
   @FXML
   void compute(final ActionEvent actionEvent) {
     LOG.debug("compute");
-    stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed);
-    // TODO mettre un feed back dans l'interface pour afficher les id's du stock qui n'ont pas été trouvés
+    stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
 
   }
 
@@ -243,10 +241,4 @@ public class MainFrameController implements Initializable {
     return stage;
   }
 
-  public void setAppender(final StringAppender appender) {
-    this.appender = appender;
-    if (appender != null && mainPresentationModel != null) {
-      appender.setPresentationModel(mainPresentationModel);
-    }
-  }
 }

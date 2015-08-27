@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?language javascript?>
-<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -31,7 +30,7 @@
          <RowConstraints />
     </rowConstraints>
     <Label text="%ui.in.excel.file.label" />
-    <Button fx:id="excelFileInButton" mnemonicParsing="false" text="%ui.in.excel.file.button" GridPane.columnIndex="2"
+    <Button mnemonicParsing="false" text="%ui.in.excel.file.button" GridPane.columnIndex="2"
         onAction="#chooseExcelIn" GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
     <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1" />
     <Label text="%ui.in.excel.sheet.label" GridPane.rowIndex="1" />
@@ -46,16 +45,16 @@
     <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
     <Label text="%ui.stock.file.label" GridPane.rowIndex="6" />
     <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-    <Button fx:id="stockFileButton" mnemonicParsing="false" text="%ui.stock.file.button" GridPane.columnIndex="2"
+    <Button mnemonicParsing="false" text="%ui.stock.file.button" GridPane.columnIndex="2"
             GridPane.rowIndex="6" onAction="#chooseStockTextFile"
             GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
     <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7">
-      <Button fx:id="computeButton" mnemonicParsing="false" text="%ui.compute.button" onAction="#compute"/>
-      <Button fx:id="saveButton" mnemonicParsing="false" text="%ui.save.button" onAction="#save"/>
+      <Button mnemonicParsing="false" text="%ui.compute.button" onAction="#compute"/>
+      <Button mnemonicParsing="false" text="%ui.save.button" onAction="#save"/>
     </HBox>
-    <TextField fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
+    <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
                GridPane.rowIndex="8" GridPane.rowSpan="5" />
-    <Button fx:id="clearButton" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.rowIndex="13"
+    <Button text="%ui.clear.button" GridPane.columnIndex="2" GridPane.rowIndex="13"
         onAction="#clear"  GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
   </GridPane>
 </StackPane>
