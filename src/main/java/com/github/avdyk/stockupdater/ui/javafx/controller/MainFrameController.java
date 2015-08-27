@@ -14,7 +14,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
@@ -64,7 +63,7 @@ public class MainFrameController implements Initializable {
   @FXML
   private ComboBox<String> inSheetComboBox;
   @FXML
-  private ChoiceBox<String> inColumnsChoiceBox;
+  private ComboBox<String> inColumnsComboBox;
   @FXML
   private ComboBox<String> stockColumnsComboBox;
   @FXML
@@ -104,10 +103,10 @@ public class MainFrameController implements Initializable {
     // - selected sheetname of excel in file
     inSheetComboBox.valueProperty().bindBidirectional(mainPresentationModel.sheetNameInProperty());
     // - populate column names from in sheet
-    inColumnsChoiceBox.setItems(mainPresentationModel.inColumnsProperty());
-    inColumnsChoiceBox.valueProperty().addListener(this::inColumnSelected);
+    inColumnsComboBox.setItems(mainPresentationModel.inColumnsProperty());
+    inColumnsComboBox.valueProperty().addListener(this::inColumnSelected);
     // - selected in columns of excel in file
-    inColumnsChoiceBox.valueProperty().bindBidirectional(mainPresentationModel.inProperty());
+    inColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.inProperty());
     // - populate stock columns from in sheet
     stockColumnsComboBox.setItems(mainPresentationModel.inColumnsProperty());
     stockColumnsComboBox.valueProperty().addListener(this::stockColumnSelected);

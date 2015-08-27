@@ -37,7 +37,7 @@
     <Label text="%ui.in.excel.sheet.label" GridPane.rowIndex="1" />
     <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
     <Label text="%ui.in.excel.column.label" GridPane.rowIndex="2" />
-    <ChoiceBox fx:id="inColumnsChoiceBox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+    <ComboBox fx:id="inColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
     <Label text="%ui.stock.excel.column.label" GridPane.rowIndex="3" />
     <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3" />
     <Label text="%ui.out.excel.file.label" GridPane.rowIndex="4" />
