@@ -41,12 +41,12 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>4.1.6.RELEASE</version>
+        <version>4.2.0.RELEASE</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>4.1.6.RELEASE</version>
+        <version>4.2.0.RELEASE</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -58,7 +58,6 @@
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>1.7.6</version>
-        <!--<version>1.7.9</version>-->
       </dependency>
       <dependency>
         <groupId>junit</groupId>
@@ -105,103 +104,103 @@
     </dependency>
   </dependencies>
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>exec-maven-plugin</artifactId>
-          <version>1.3.2</version>
-          <configuration>
-            <mainClass>com.github.avdyk.stockupdater.ui.javafx.StockUpdater</mainClass>
-          </configuration>
-        </plugin>
-        <!-- copy dependencies in lib -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.7</version>
-          <executions>
-            <execution>
-              <phase>validate</phase>
-              <goals>
-                <goal>copy-dependencies</goal>
-              </goals>
-              <configuration>
-                <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                <excludeScope>provided</excludeScope>
-                <silent>true</silent>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-        <!-- self-contained app -->
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>1.7</version>
-          <executions>
-            <execution>
-              <phase>install</phase>
-              <configuration>
-                <target xmlns:fx="javafx:com.sun.javafx.tools.ant">
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.3.2</version>
+        <configuration>
+          <mainClass>com.github.avdyk.stockupdater.ui.javafx.StockUpdater</mainClass>
+        </configuration>
+      </plugin>
+      <!-- copy dependencies in lib -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <excludeScope>provided</excludeScope>
+              <silent>true</silent>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- self-contained app -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <configuration>
+              <target xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
-                  <!--definition d'une tâche pour pouvoir utiliser les commandes ant qui se trouvent dans le ant-javafx.jar du JDK-->
-                  <taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant"
-                           classpath="${javafx.lib.ant-javafx.jar}"/>
-                  <!--definition de l'application-->
-                  <fx:application id="app" name="${project.name}" mainClass="${mainJavaFXClass}"/>
+                <!--definition d'une tâche pour pouvoir utiliser les commandes ant qui se trouvent dans le ant-javafx.jar du JDK-->
+                <taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant"
+                         classpath=".:${javafx.lib.ant-javafx.jar}"/>
+                <!--definition de l'application-->
+                <fx:application id="app" name="${project.name}" mainClass="${mainJavaFXClass}"/>
 
-                  <!--définition du classpath-->
-                  <fx:resources id="appRes">
-                    <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar"/>
-                    <fileset dir="${project.build.directory}" includes="lib/*.jar"
-                             excludes="lib/aspectj*.jar,surfire/*.jar"/>
-                  </fx:resources>
-                  <!--creation du jar principal-->
-                  <fx:jar destfile="${project.build.directory}/${project.build.finalName}.jar">
-                    <!-- application à lancer -->
-                    <application refid="app"/>
-                    <!-- classpath à utiliser -->
-                    <resources refid="appRes"/>
-                    <!--entrées du fichier manifest-->
-                    <manifest>
-                      <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
-                      <attribute name="Implementation-Title" value="${project.name}"/>
-                      <attribute name="Implementation-Version" value="${project.version}"/>
-                      <attribute name="permissions" value="all-permissions"/>
-                      <attribute name="codebase" value="*"/>
-                    </manifest>
-                    <!-- classes qu'on doit mettre dans le jar -->
-                    <fileset dir="${project.build.directory}/classes"/>
-                  </fx:jar>
-                  <fx:resources id="other">
-                    <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar"/>
-                    <fileset dir="${project.build.directory}" includes="lib/*.jar"
-                             excludes="lib/aspectj*.jar,surfire/*.jar,lib/bcprov*.jar"/>
-                  </fx:resources>
+                <!--définition du classpath-->
+                <fx:resources id="appRes">
+                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar"/>
+                  <fileset dir="${project.build.directory}" includes="lib/*.jar"
+                           excludes="lib/aspectj*.jar,surfire/*.jar"/>
+                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.icns"/>
+                </fx:resources>
+                <!--creation du jar principal-->
+                <fx:jar destfile="${project.build.directory}/${project.build.finalName}.jar">
+                  <!-- application à lancer -->
+                  <application refid="app"/>
+                  <!-- classpath à utiliser -->
+                  <resources refid="appRes"/>
+                  <!--entrées du fichier manifest-->
+                  <manifest>
+                    <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
+                    <attribute name="Implementation-Title" value="${project.name}"/>
+                    <attribute name="Implementation-Version" value="${project.version}"/>
+                    <attribute name="permissions" value="all-permissions"/>
+                    <attribute name="codebase" value="*"/>
+                  </manifest>
+                  <!-- classes qu'on doit mettre dans le jar -->
+                  <fileset dir="${project.build.directory}/classes"/>
+                </fx:jar>
+                <fx:resources id="other">
+                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar"/>
+                  <fileset dir="${project.build.directory}" includes="lib/*.jar"
+                           excludes="lib/aspectj*.jar,surfire/*.jar,lib/bcprov*.jar"/>
+                </fx:resources>
 
-                  <!--creation du fichier JNLP et de la page html pour la version embedded-->
-                  <fx:deploy width="${app.width}" height="${app.height}"
-                             nativeBundles="all"
-                             outdir="${project.build.directory}" outfile="${project.name}"
-                      >
-                    <application refId="app"/>
+                <!--creation du fichier JNLP et de la page html pour la version embedded-->
+                <fx:deploy width="${app.width}" height="${app.height}"
+                           nativeBundles="all"
+                           outdir="${project.build.directory}" outfile="${project.name}"
+                           verbose="true"
+                    >
+                  <application refId="app"/>
 
-                    <resources refid="other"/>
-                    <fx:info title="${project.name}" vendor="${project.organization.name}"
-                             description="${project.description}"/>
-                  </fx:deploy>
-                </target>
+                  <resources refid="other"/>
+                  <fx:info title="${project.name}" vendor="${project.organization.name}"
+                           description="${project.description}"/>
+                </fx:deploy>
+              </target>
 
-              </configuration>
-              <goals>
-                <goal>run</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
