@@ -11,12 +11,29 @@
       </pattern>
     </encoder>
   </appender>
+  <!-- do a roller file appender for each run with timestamp appende in the name -->
+  <appender name="FOUND" class="ch.qos.logback.core.FileAppender">
+    <file>log/stockupdater-found.log</file>
+    <encoder>
+      <pattern>%msg%n
+      </pattern>
+    </encoder>
+  </appender>
+  <appender name="NOTFOUND" class="ch.qos.logback.core.FileAppender">
+    <file>log/stockupdater-not-found.log</file>
+    <encoder>
+      <pattern>%msg%n
+      </pattern>
+    </encoder>
+  </appender>
 
   <logger name="org.springframework" level="warn" />
   <logger name="com.github.avdyk.stockupdater" level="info" />
   <!--<logger name="com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController" level="trace"/>-->
 
-  <root level="info">
+  <logger name="com.github.avdyk.stockupdater.StockComputeImpl" level="info" />
+
+  <root level="trace">
     <appender-ref ref="FILE"/>
   </root>
 </configuration>
