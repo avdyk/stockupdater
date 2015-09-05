@@ -193,7 +193,7 @@ public class MainFrameController implements Initializable {
   }
 
   void inColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
-    LOG.debug("selected in column names: {}; in service: {}", newValue,
+    LOG.info("selected in column names: {}; in service: {}", newValue,
         this.stockService.getInService().getSelectedColumnName());
     if (newValue instanceof String) {
       this.stockService.getInService().setSelectedColumn((String) newValue);
@@ -201,14 +201,14 @@ public class MainFrameController implements Initializable {
   }
 
   void outColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
-    LOG.debug("selected out column name: {}", newValue);
+    LOG.info("selected out column name: {}", newValue);
     if (newValue instanceof String) {
       this.stockService.getOutService().setSelectedColumn((String) newValue);
     }
   }
 
   void stockColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
-    LOG.debug("selected stock column name: {}", newValue);
+    LOG.info("selected stock column name: {}", newValue);
     if (newValue instanceof String) {
       this.stockService.getStockService().setSelectedColumn((String) newValue);
     }
@@ -216,21 +216,19 @@ public class MainFrameController implements Initializable {
 
   @FXML
   void compute(final ActionEvent actionEvent) {
-    LOG.debug("compute");
+    LOG.info("compute");
     stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
 
   }
 
   @FXML
   void save(final ActionEvent actionEvent) {
-    LOG.debug("save");
+    LOG.info("save");
     final String filename = this.mainPresentationModel.getExcelFileIn();
-    try {
-      OutputStream outStream = Files.newOutputStream(
-          Paths.get(filename), StandardOpenOption.WRITE);
+    try (OutputStream outStream = Files.newOutputStream(
+        Paths.get(filename), StandardOpenOption.WRITE)) {
       stockService.writeExcelWorkbook(outStream);
-      outStream.flush();
-      outStream.close();
+      LOG.info("File %s has been saved", filename);
     } catch (IOException e) {
       LOG.error(String.format("Problem writing file %s", filename));
     }
@@ -238,7 +236,7 @@ public class MainFrameController implements Initializable {
 
   @FXML
   void clear(final ActionEvent actionEvent) {
-    LOG.debug("clear");
+    LOG.info("clear");
     mainPresentationModel.setLogOutput("");
   }
 
