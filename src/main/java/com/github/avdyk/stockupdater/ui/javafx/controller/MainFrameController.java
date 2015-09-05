@@ -195,14 +195,23 @@ public class MainFrameController implements Initializable {
   void inColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
     LOG.debug("selected in column names: {}; in service: {}", newValue,
         this.stockService.getInService().getSelectedColumnName());
+    if (newValue instanceof String) {
+      this.stockService.getInService().setSelectedColumn((String) newValue);
+    }
   }
 
   void outColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
     LOG.debug("selected out column name: {}", newValue);
+    if (newValue instanceof String) {
+      this.stockService.getOutService().setSelectedColumn((String) newValue);
+    }
   }
 
   void stockColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
     LOG.debug("selected stock column name: {}", newValue);
+    if (newValue instanceof String) {
+      this.stockService.getStockService().setSelectedColumn((String) newValue);
+    }
   }
 
   @FXML
