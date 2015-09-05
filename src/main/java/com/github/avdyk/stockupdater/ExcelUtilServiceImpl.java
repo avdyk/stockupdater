@@ -26,12 +26,12 @@ public class ExcelUtilServiceImpl {
             if (StringUtils.isNumeric(cellValue)) {
                 id = Long.valueOf(cellValue);
             } else {
-                LOG.debug("The cell at row {}, col {} has no numeric value ({})", cell.getRow(),
+                LOG.debug("The cell at row {}, col {} has no numeric value ({})", cell.getRowIndex(),
                         cell.getColumnIndex(), cellValue);
                 id = null;
             }
         } else {
-            LOG.warn("The cell at row {}, col {} is neither numeric or string", cell.getRow(),
+            LOG.warn("The cell at row {}, col {} is neither numeric or string", cell.getRowIndex(),
                     cell.getColumnIndex());
             id = null;
         }
