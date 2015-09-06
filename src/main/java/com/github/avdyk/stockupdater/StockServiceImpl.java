@@ -5,6 +5,8 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,8 @@ public class StockServiceImpl implements StockService {
 
   private static final Logger LOG = LoggerFactory.getLogger(StockServiceImpl.class);
   private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.S");
+  private static final Marker FOUND = MarkerFactory.getMarker("FOUND");
+  private static final Marker NOT_FOUND = MarkerFactory.getMarker("NOT_FOUND");
 
   @Autowired
   private ArticleService inService;
@@ -60,9 +64,11 @@ public class StockServiceImpl implements StockService {
         final Set<Integer> rows = inService.getIdsWithLineNumbersIndexes().get(id);
         if (rows != null && !rows.isEmpty()) {
           updateStock(updateType, rows, quantity);
+          final String msg = String.format("Article found: %d", id);
+          LOG.info(FOUND, msg);
         } else {
-          final String msg = String.format("Article %d has not been found!", id);
-          LOG.warn(msg);
+          final String msg = String.format("Article not found: %d", id);
+          LOG.warn(NOT_FOUND, msg);
           // TODO try to use a log appender
           presentationModel.setLogOutput(presentationModel.getLogOutput() + msg + "\n");
         }
