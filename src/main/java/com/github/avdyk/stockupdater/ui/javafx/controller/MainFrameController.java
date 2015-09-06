@@ -228,9 +228,9 @@ public class MainFrameController implements Initializable {
     try (OutputStream outStream = Files.newOutputStream(
         Paths.get(filename), StandardOpenOption.WRITE)) {
       stockService.writeExcelWorkbook(outStream);
-      LOG.info("File %s has been saved", filename);
+      LOG.info("File {} has been saved", filename);
     } catch (IOException e) {
-      LOG.error(String.format("Problem writing file %s", filename));
+      LOG.error("Problem writing file {}", filename, e);
     }
   }
 
