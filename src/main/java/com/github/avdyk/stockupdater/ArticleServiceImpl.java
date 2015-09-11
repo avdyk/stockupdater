@@ -41,6 +41,7 @@ public class ArticleServiceImpl implements ArticleService {
   List<String> columnNames = Collections.emptyList();
   String selectedColumn;
   Map<Long, Set<Integer>> INDEXES = new HashMap<>();
+  String selectedLabelColumn;
 
   @Autowired
   private ExcelUtilServiceImpl excelUtilService;
@@ -172,5 +173,15 @@ public class ArticleServiceImpl implements ArticleService {
   @Override
   public Map<Long, Set<Integer>> getIdsWithLineNumbersIndexes() {
     return Collections.unmodifiableMap(INDEXES);
+  }
+
+  @Override
+  public void setSelectedLabelColumn(final String newValue) {
+    this.selectedLabelColumn = newValue;
+  }
+
+  @Override
+  public String getSelectedLabelColumn() {
+    return this.selectedLabelColumn;
   }
 }

@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import static java.time.LocalDateTime.*;
 
@@ -71,8 +72,21 @@ public class StockServiceImpl implements StockService {
         final Set<Integer> rows = inService.getIdsWithLineNumbersIndexes().get(id);
         if (rows != null && !rows.isEmpty()) {
           updateStock(updateType, rows, quantity);
-          final String msg = String.format("Article found: %d", id);
+          final String label;
+          if (presentationModel.getLabelColumn() != null) {
+            final int labelColIndex = inService.getColumnsName().indexOf(this.inService.getSelectedLabelColumn());
+            final StringJoiner joiner = new StringJoiner(";", "(", ")");
+            for (int r : rows) {
+              joiner.add(inService.getSelectedSheet().getRow(r).getCell(labelColIndex).getStringCellValue());
+            }
+            label = joiner.toString();
+          } else {
+            label = "NO LABEL SELECTED";
+          }
+          final String msg = String.format("Article found %s: %d", label, id);
           LOG.info(FOUND, msg);
+          // TODO try to use a log appender
+          presentationModel.setLogOutput(presentationModel.getLogOutput() + msg + "\n");
         } else {
           final String msg = String.format("Article not found: %d", id);
           LOG.warn(NOT_FOUND, msg);

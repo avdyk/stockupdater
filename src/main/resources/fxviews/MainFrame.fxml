@@ -30,32 +30,29 @@
          <RowConstraints />
     </rowConstraints>
     <Label text="%ui.in.excel.file.label" />
-    <Button mnemonicParsing="false" text="%ui.in.excel.file.button" GridPane.columnIndex="2"
-        onAction="#chooseExcelIn" GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
+    <Button mnemonicParsing="false" onAction="#chooseExcelIn" text="%ui.in.excel.file.button" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
     <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1" />
     <Label text="%ui.in.excel.sheet.label" GridPane.rowIndex="1" />
     <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
     <Label text="%ui.in.excel.column.label" GridPane.rowIndex="2" />
     <ComboBox fx:id="inColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-    <Label text="%ui.stock.excel.column.label" GridPane.rowIndex="3" />
-    <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-    <Label text="%ui.out.excel.column.label" GridPane.rowIndex="4" />
-    <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-    <Label text="%ui.update.type.label" GridPane.rowIndex="5" />
-    <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-    <Label text="%ui.stock.file.label" GridPane.rowIndex="6" />
-    <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-    <Button mnemonicParsing="false" text="%ui.stock.file.button" GridPane.columnIndex="2"
-            GridPane.rowIndex="6" onAction="#chooseStockTextFile"
-            GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
-    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7">
-      <Button mnemonicParsing="false" text="%ui.compute.button" onAction="#compute"/>
-      <Button mnemonicParsing="false" text="%ui.save.button" onAction="#save"/>
-      <Button mnemonicParsing="false" text="%ui.savecsv.button" onAction="#saveCSV"/>
+    <Label text="%ui.label.excel.column.label" GridPane.rowIndex="3" />
+    <ComboBox fx:id="labelColumnComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+    <Label text="%ui.stock.excel.column.label" GridPane.rowIndex="4" />
+    <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    <Label text="%ui.out.excel.column.label" GridPane.rowIndex="5" />
+    <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+    <Label text="%ui.update.type.label" GridPane.rowIndex="6" />
+    <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+    <Label text="%ui.stock.file.label" GridPane.rowIndex="7" />
+    <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+    <Button mnemonicParsing="false" onAction="#chooseStockTextFile" text="%ui.stock.file.button" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
+    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8">
+      <Button mnemonicParsing="false" onAction="#compute" text="%ui.compute.button" />
+      <Button mnemonicParsing="false" onAction="#save" text="%ui.save.button" />
+      <Button mnemonicParsing="false" onAction="#saveCSV" text="%ui.savecsv.button" />
     </HBox>
-    <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
-               GridPane.rowIndex="8" GridPane.rowSpan="5" />
-    <Button text="%ui.clear.button" GridPane.columnIndex="2" GridPane.rowIndex="13"
-        onAction="#clear"  GridPane.valignment="CENTER" GridPane.halignment="CENTER" />
+    <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9" GridPane.rowSpan="5" />
+    <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="14" GridPane.valignment="CENTER" />
   </GridPane>
 </StackPane>

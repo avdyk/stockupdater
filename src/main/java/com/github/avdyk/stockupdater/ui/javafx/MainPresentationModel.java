@@ -26,7 +26,8 @@ public class MainPresentationModel {
   private ListProperty<String> excelFileInSheetNames = new SimpleListProperty<>();
   private StringProperty sheetNameIn = new SimpleStringProperty();
   private ListProperty<String> inColumns = new SimpleListProperty<>();
-//  private ListProperty<String> in = new SimpleListProperty<>();
+  //  private ListProperty<String> in = new SimpleListProperty<>();
+  private StringProperty labelColumn = new SimpleStringProperty();
   private StringProperty in = new SimpleStringProperty();
   private StringProperty stockColumn = new SimpleStringProperty();
   private ListProperty<String> outColumns = new SimpleListProperty<>();
@@ -131,6 +132,18 @@ public class MainPresentationModel {
 
   public void setInColumns(ObservableList<String> inColumns) {
     this.inColumns.set(inColumns);
+  }
+
+  public String getLabelColumn() {
+    return labelColumn.get();
+  }
+
+  public StringProperty labelColumnProperty() {
+    return labelColumn;
+  }
+
+  public void setLabelColumn(String labelColumn) {
+    this.labelColumn.set(labelColumn);
   }
 
   public ObservableList<String> getOutColumns() {

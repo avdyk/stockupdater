@@ -70,6 +70,8 @@ public class MainFrameController implements Initializable {
   @FXML
   private ComboBox<String> inColumnsComboBox;
   @FXML
+  private ComboBox<String> labelColumnComboBox;
+  @FXML
   private ComboBox<String> stockColumnsComboBox;
   @FXML
   private ComboBox<String> outColumnsComboBox;
@@ -107,6 +109,11 @@ public class MainFrameController implements Initializable {
     inColumnsComboBox.valueProperty().addListener(this::inColumnSelected);
     // - selected in columns of excel in file
     inColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.inProperty());
+    // - populate column names from in sheet
+    labelColumnComboBox.setItems(mainPresentationModel.inColumnsProperty());
+    labelColumnComboBox.valueProperty().addListener(this::labelColumnSelected);
+    // - selected label column of excel in file
+    labelColumnComboBox.valueProperty().bindBidirectional(mainPresentationModel.labelColumnProperty());
     // - populate stock columns from in sheet
     stockColumnsComboBox.setItems(mainPresentationModel.inColumnsProperty());
     stockColumnsComboBox.valueProperty().addListener(this::stockColumnSelected);
@@ -202,6 +209,13 @@ public class MainFrameController implements Initializable {
         this.stockService.getInService().getSelectedColumnName());
     if (newValue instanceof String) {
       this.stockService.getInService().setSelectedColumn((String) newValue);
+    }
+  }
+
+  void labelColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
+    LOG.info("selected label column name: {}", newValue);
+    if (newValue instanceof String) {
+      this.stockService.getInService().setSelectedLabelColumn((String) newValue);
     }
   }
 
