@@ -47,12 +47,16 @@
     <Label text="%ui.stock.file.label" GridPane.rowIndex="7" />
     <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
     <Button mnemonicParsing="false" onAction="#chooseStockTextFile" text="%ui.stock.file.button" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="7" GridPane.valignment="CENTER" />
-    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8">
+    <Label text="%ui.scan.label" GridPane.rowIndex="8" />
+    <TextField fx:id="scanTextField" GridPane.columnIndex="1" GridPane.rowIndex="8" onAction="#scanAction"/>
+    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9">
       <Button mnemonicParsing="false" onAction="#compute" text="%ui.compute.button" />
       <Button mnemonicParsing="false" onAction="#save" text="%ui.save.button" />
       <Button mnemonicParsing="false" onAction="#saveCSV" text="%ui.savecsv.button" />
     </HBox>
-    <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9" GridPane.rowSpan="5" />
-    <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="14" GridPane.valignment="CENTER" />
+    <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
+              GridPane.rowIndex="10" GridPane.rowSpan="5" />
+    <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER"
+            GridPane.rowIndex="15" GridPane.valignment="CENTER" />
   </GridPane>
 </StackPane>

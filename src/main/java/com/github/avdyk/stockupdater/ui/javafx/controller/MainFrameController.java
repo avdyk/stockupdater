@@ -1,12 +1,12 @@
 package com.github.avdyk.stockupdater.ui.javafx.controller;
 
-import ch.qos.logback.classic.LoggerContext;
 import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,9 +21,6 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +35,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Controller for the main frame.
@@ -79,6 +73,8 @@ public class MainFrameController implements Initializable {
   private ComboBox<UpdateType> updateTypeComboBox;
   @FXML
   private TextField stockFileTextField;
+  @FXML
+  private TextField scanTextField;
   @FXML
   private TextArea logOutput;
 
@@ -130,6 +126,13 @@ public class MainFrameController implements Initializable {
     mainPresentationModel.setUpdateType(UpdateType.TEST);
     // - stock file field
     stockFileTextField.textProperty().bind(mainPresentationModel.stockFileProperty());
+    scanTextField.textProperty().addListener(
+        (observable, oldValue, newValue) -> {
+          if (!newValue.matches("\\d*")) {
+            ((StringProperty) observable).setValue(oldValue);
+          }
+        }
+    );
     logOutput.textProperty().bind(mainPresentationModel.logOutputProperty());
     // registrer the appender
 
@@ -195,9 +198,7 @@ public class MainFrameController implements Initializable {
       List<String> cols = this.stockService.getInService().getColumnsName();
       if (LOG.isTraceEnabled()) {
         StringJoiner sj = new StringJoiner(", ", "Columns name: ", ".");
-        for (String c : cols) {
-          sj.add(c);
-        }
+        cols.forEach(sj::add);
         LOG.trace(sj.toString());
       }
       ObservableList<String> obs = FXCollections.observableArrayList(cols);
@@ -235,6 +236,7 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused") // called by fxml
   void compute(final ActionEvent actionEvent) {
     LOG.info("compute");
     stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
@@ -242,6 +244,7 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused") // called by fxml
   void save(final ActionEvent actionEvent) {
     final String outputFilename = getOutputFilename(".xlsx");
     LOG.info("save in file: {}", outputFilename);
@@ -256,6 +259,7 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused") // called by fxml
   void saveCSV(final ActionEvent actionEvent) {
     final String outputFilename = getOutputFilename(".csv");
     LOG.info("save in CSV file {}", outputFilename);
@@ -285,17 +289,29 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
+  @SuppressWarnings("unused") // called by fxml
   void clear(final ActionEvent actionEvent) {
     LOG.info("clear");
     mainPresentationModel.setLogOutput("");
   }
 
-  public void setStage(final Stage stage) {
-    this.stage = stage;
+
+  @FXML
+  @SuppressWarnings("unused") // called by fxml
+  public void scanAction(final ActionEvent actionEvent) {
+    final String scanText = this.scanTextField.getText();
+    if (StringUtils.isNotBlank(scanText)) {
+      LOG.info("Direct Scan: {}", scanText);
+      final Map<Long, Long> lightStock = new HashMap<>();
+      final Long id = Long.parseLong(scanText);
+      lightStock.put(id, 1L);
+      stockService.updateStock(mainPresentationModel.getUpdateType(), lightStock, mainPresentationModel);
+      this.scanTextField.clear();
+    }
   }
 
-  public Stage getStage() {
-    return stage;
+  public void setStage(final Stage stage) {
+    this.stage = stage;
   }
 
 }

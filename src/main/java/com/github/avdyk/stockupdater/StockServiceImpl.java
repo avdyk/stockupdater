@@ -3,7 +3,6 @@ package com.github.avdyk.stockupdater;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -15,7 +14,6 @@ import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -102,7 +100,12 @@ public class StockServiceImpl implements StockService {
     assert updateType != null;
     assert rows != null;
     assert !rows.isEmpty();
-    final int outIndex = this.outService.getColumnsName().indexOf(this.outService.getSelectedColumnName());
+    final Integer outIndex;
+    if (StringUtils.isNotBlank(this.outService.getSelectedColumnName())) {
+      outIndex = this.outService.getColumnsName().indexOf(this.outService.getSelectedColumnName());
+    } else {
+      outIndex = null;
+    }
     final Integer stockIndex;
     if (StringUtils.isNotBlank(this.stockService.getSelectedColumnName())) {
       stockIndex = this.stockService.getColumnsName().indexOf(this.stockService.getSelectedColumnName());
@@ -119,9 +122,15 @@ public class StockServiceImpl implements StockService {
             originalStock = 0;
           }
           final XSSFRow r = this.outService.getSelectedSheet().getRow(row);
-          XSSFCell cell = r.getCell(outIndex);
-          if (cell == null) {
-            cell = r.createCell(outIndex);
+          final XSSFCell cell;
+          if (outIndex != null) {
+            if (r.getCell(outIndex) != null) {
+              cell = r.getCell(outIndex);
+            } else {
+              cell = r.createCell(outIndex);
+            }
+          } else {
+            cell = null;
           }
           final double newValue;
           switch (updateType) {
@@ -136,7 +145,7 @@ public class StockServiceImpl implements StockService {
             default:
               newValue = quantity;
           }
-          if (updateType != UpdateType.TEST) {
+          if (updateType != UpdateType.TEST && cell != null) {
             cell.setCellValue(newValue);
           }
           LOG.info("Update stock for line {}: from {} to {}", row, originalStock, newValue);
