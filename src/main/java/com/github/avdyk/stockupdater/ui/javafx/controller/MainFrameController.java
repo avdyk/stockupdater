@@ -6,6 +6,7 @@ import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+import javafx.application.Platform;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -137,6 +138,9 @@ public class MainFrameController implements Initializable {
     // registrer the appender
 
     // TODO bindings to button save and button compute enable
+
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   @FXML
@@ -158,7 +162,8 @@ public class MainFrameController implements Initializable {
         LOG.warn("File not found", e);
       }
     }
-
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   @FXML
@@ -179,6 +184,8 @@ public class MainFrameController implements Initializable {
     } catch (IOException e) {
       LOG.warn("Une exception a eu lieu", e);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   String getPathFromUser(final String title) {
@@ -204,6 +211,8 @@ public class MainFrameController implements Initializable {
       ObservableList<String> obs = FXCollections.observableArrayList(cols);
       this.mainPresentationModel.setInColumns(obs);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   void inColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
@@ -212,6 +221,8 @@ public class MainFrameController implements Initializable {
     if (newValue instanceof String) {
       this.stockService.getInService().setSelectedColumn((String) newValue);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   void labelColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
@@ -219,6 +230,8 @@ public class MainFrameController implements Initializable {
     if (newValue instanceof String) {
       this.stockService.getInService().setSelectedLabelColumn((String) newValue);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   void outColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
@@ -226,6 +239,8 @@ public class MainFrameController implements Initializable {
     if (newValue instanceof String) {
       this.stockService.getOutService().setSelectedColumn((String) newValue);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   void stockColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
@@ -233,6 +248,8 @@ public class MainFrameController implements Initializable {
     if (newValue instanceof String) {
       this.stockService.getStockService().setSelectedColumn((String) newValue);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   @FXML
@@ -240,7 +257,8 @@ public class MainFrameController implements Initializable {
   void compute(final ActionEvent actionEvent) {
     LOG.info("compute");
     stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
-
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   @FXML
@@ -256,6 +274,8 @@ public class MainFrameController implements Initializable {
     } catch (IOException e) {
       LOG.error("Problem writing file {}", outputFilename, e);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   @FXML
@@ -270,6 +290,8 @@ public class MainFrameController implements Initializable {
     } catch (IOException e) {
       LOG.error("Problem writing file {}", outputFilename, e);
     }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
   String getOutputFilename(final String suffixe) {
@@ -293,6 +315,8 @@ public class MainFrameController implements Initializable {
   void clear(final ActionEvent actionEvent) {
     LOG.info("clear");
     mainPresentationModel.setLogOutput("");
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
   }
 
 
@@ -307,6 +331,8 @@ public class MainFrameController implements Initializable {
       lightStock.put(id, 1L);
       stockService.updateStock(mainPresentationModel.getUpdateType(), lightStock, mainPresentationModel);
       this.scanTextField.clear();
+      // request focus on the scan textfield
+      Platform.runLater(scanTextField::requestFocus);
     }
   }
 
