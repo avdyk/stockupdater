@@ -1,5 +1,6 @@
 package com.github.avdyk.stockupdater.ui.javafx.controller;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
@@ -20,6 +21,9 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +32,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -130,8 +138,8 @@ public class MainFrameController implements Initializable {
         .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.in.excel.file.dialog.title"));
     mainPresentationModel.setExcelFileIn(fileName);
     if (fileName != null && StringUtils.isNotBlank(fileName)) {
-      try {
-        final XSSFWorkbook wb = new XSSFWorkbook(Files.newInputStream(Paths.get(fileName)));
+      try (InputStream instream = Files.newInputStream(Paths.get(fileName))) {
+        final XSSFWorkbook wb = new XSSFWorkbook(instream);
         this.stockService.getInService().setWorkbook(wb);
         this.stockService.getStockService().setWorkbook(wb);
         this.stockService.getOutService().setWorkbook(wb);
@@ -225,9 +233,22 @@ public class MainFrameController implements Initializable {
   void save(final ActionEvent actionEvent) {
     LOG.info("save");
     final String filename = this.mainPresentationModel.getExcelFileIn();
+    final String filenameWithoutTheDot = filename.substring(0, filename.lastIndexOf('.'));
+    final String suffixe = filename.substring(filename.lastIndexOf('.'));
+    final String bySeconds = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
+    final String outputFilename = String.format("%s-%s%s", filenameWithoutTheDot, bySeconds, suffixe);
+    final Path outPath = Paths.get(outputFilename);
+    if (!Files.exists(outPath)) {
+      try {
+        Files.createFile(outPath);
+      } catch (IOException e) {
+        LOG.error("Problem creating the path: {}", outputFilename);
+      }
+    }
     try (OutputStream outStream = Files.newOutputStream(
-        Paths.get(filename), StandardOpenOption.WRITE)) {
+        Paths.get(outputFilename), StandardOpenOption.WRITE)) {
       stockService.writeExcelWorkbook(outStream);
+      outStream.flush();
       LOG.info("File {} has been saved", filename);
     } catch (IOException e) {
       LOG.error("Problem writing file {}", filename, e);
