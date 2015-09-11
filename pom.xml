@@ -6,7 +6,7 @@
   <artifactId>stockupdater</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>Stock Updater</name>
+  <name>StockUpdater</name>
   <url>https://github.com/avdyk/stockupdater</url>
   <organization>
     <name>Bastard Software</name>
