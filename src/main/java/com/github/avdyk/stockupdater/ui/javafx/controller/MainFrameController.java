@@ -127,6 +127,7 @@ public class MainFrameController implements Initializable {
     // - updateTypeComboBox bindings
     updateTypeComboBox.setItems(FXCollections.observableArrayList(UpdateType.values()));
     updateTypeComboBox.valueProperty().bindBidirectional(mainPresentationModel.updateTypeProperty());
+    mainPresentationModel.setUpdateType(UpdateType.TEST);
     // - stock file field
     stockFileTextField.textProperty().bind(mainPresentationModel.stockFileProperty());
     logOutput.textProperty().bind(mainPresentationModel.logOutputProperty());

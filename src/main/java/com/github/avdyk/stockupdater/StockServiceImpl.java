@@ -131,11 +131,14 @@ public class StockServiceImpl implements StockService {
             case SUBSTRACT:
               newValue = originalStock - quantity;
               break;
+            case TEST:
             case UPDATE:
             default:
               newValue = quantity;
           }
-          cell.setCellValue(newValue);
+          if (updateType != UpdateType.TEST) {
+            cell.setCellValue(newValue);
+          }
           LOG.info("Update stock for line {}: from {} to {}", row, originalStock, newValue);
         });
   }
