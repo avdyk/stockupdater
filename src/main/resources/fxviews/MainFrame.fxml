@@ -51,6 +51,7 @@
     <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7">
       <Button mnemonicParsing="false" text="%ui.compute.button" onAction="#compute"/>
       <Button mnemonicParsing="false" text="%ui.save.button" onAction="#save"/>
+      <Button mnemonicParsing="false" text="%ui.savecsv.button" onAction="#saveCSV"/>
     </HBox>
     <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
                GridPane.rowIndex="8" GridPane.rowSpan="5" />

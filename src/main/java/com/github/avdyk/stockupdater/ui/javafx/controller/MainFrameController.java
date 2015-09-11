@@ -30,10 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -231,7 +228,32 @@ public class MainFrameController implements Initializable {
 
   @FXML
   void save(final ActionEvent actionEvent) {
-    LOG.info("save");
+    final String outputFilename = getOutputFilename();
+    LOG.info("save in file: {}", outputFilename);
+    try (OutputStream outStream = Files.newOutputStream(
+        Paths.get(outputFilename), StandardOpenOption.WRITE)) {
+      stockService.writeExcelWorkbook(outStream);
+      outStream.flush();
+      LOG.info("File {} has been saved", outputFilename);
+    } catch (IOException e) {
+      LOG.error("Problem writing file {}", outputFilename, e);
+    }
+  }
+
+  @FXML
+  void saveCSV(final ActionEvent actionEvent) {
+    final String outputFilename = getOutputFilename();
+    LOG.info("save in CSV file {}", outputFilename);
+    try (BufferedWriter out = new BufferedWriter(Files.newBufferedWriter(
+        Paths.get(outputFilename), StandardOpenOption.WRITE))) {
+      stockService.writeCSV(out);
+      out.flush();
+    } catch (IOException e) {
+      LOG.error("Problem writing file {}", outputFilename, e);
+    }
+  }
+
+  String getOutputFilename() {
     final String filename = this.mainPresentationModel.getExcelFileIn();
     final String filenameWithoutTheDot = filename.substring(0, filename.lastIndexOf('.'));
     final String suffixe = filename.substring(filename.lastIndexOf('.'));
@@ -245,14 +267,7 @@ public class MainFrameController implements Initializable {
         LOG.error("Problem creating the path: {}", outputFilename);
       }
     }
-    try (OutputStream outStream = Files.newOutputStream(
-        Paths.get(outputFilename), StandardOpenOption.WRITE)) {
-      stockService.writeExcelWorkbook(outStream);
-      outStream.flush();
-      LOG.info("File {} has been saved", filename);
-    } catch (IOException e) {
-      LOG.error("Problem writing file {}", filename, e);
-    }
+    return outputFilename;
   }
 
   @FXML
