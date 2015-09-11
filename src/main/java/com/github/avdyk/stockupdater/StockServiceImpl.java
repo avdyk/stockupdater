@@ -1,6 +1,7 @@
 package com.github.avdyk.stockupdater;
 
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
@@ -102,11 +103,21 @@ public class StockServiceImpl implements StockService {
     assert rows != null;
     assert !rows.isEmpty();
     final int outIndex = this.outService.getColumnsName().indexOf(this.outService.getSelectedColumnName());
-    final int stockIndex = this.stockService.getColumnsName().indexOf(this.stockService.getSelectedColumnName());
+    final Integer stockIndex;
+    if (StringUtils.isNotBlank(this.stockService.getSelectedColumnName())) {
+      stockIndex = this.stockService.getColumnsName().indexOf(this.stockService.getSelectedColumnName());
+    } else {
+      stockIndex = null;
+    }
     rows.stream().filter(r -> r != null)
         .forEach(row -> {
-          final Long originalStock = excelUtilService.getLongValueFromCell(
-              this.inService.getSelectedSheet().getRow(row).getCell(stockIndex));
+          final long originalStock;
+          if (stockIndex != null) {
+            originalStock = excelUtilService.getLongValueFromCell(
+                this.inService.getSelectedSheet().getRow(row).getCell(stockIndex));
+          } else {
+            originalStock = 0;
+          }
           final XSSFRow r = this.outService.getSelectedSheet().getRow(row);
           XSSFCell cell = r.getCell(outIndex);
           if (cell == null) {
@@ -114,17 +125,15 @@ public class StockServiceImpl implements StockService {
           }
           final double newValue;
           switch (updateType) {
-            case UPDATE:
-              newValue = quantity;
-              break;
             case ADD:
               newValue = originalStock + quantity;
               break;
             case SUBSTRACT:
               newValue = originalStock - quantity;
               break;
+            case UPDATE:
             default:
-              newValue = -1;
+              newValue = quantity;
           }
           cell.setCellValue(newValue);
           LOG.info("Update stock for line {}: from {} to {}", row, originalStock, newValue);
