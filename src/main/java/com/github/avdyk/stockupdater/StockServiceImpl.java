@@ -2,6 +2,7 @@ package com.github.avdyk.stockupdater;
 
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -131,7 +132,29 @@ public class StockServiceImpl implements StockService {
       final StringBuilder s = new StringBuilder();
       while (cellIterator.hasNext()) {
         final Cell cell = cellIterator.next();
-        s.append(cell.getStringCellValue())
+        final String value;
+        switch (cell.getCellType()) {
+          case Cell.CELL_TYPE_NUMERIC:
+            value = String.valueOf(cell.getNumericCellValue());
+            break;
+          case Cell.CELL_TYPE_STRING:
+            value = cell.getStringCellValue();
+            break;
+          case Cell.CELL_TYPE_FORMULA:
+            value = cell.getCellFormula();
+            break;
+          case Cell.CELL_TYPE_BOOLEAN:
+            value = String.valueOf(cell.getBooleanCellValue());
+            break;
+          case Cell.CELL_TYPE_ERROR:
+            value = String.format("Error #%d", cell.getErrorCellValue());
+            break;
+          case Cell.CELL_TYPE_BLANK:
+          default:
+            value = "";
+            break;
+        }
+        s.append(value)
             .append(';');
       }
       if (s.length() > 1) {

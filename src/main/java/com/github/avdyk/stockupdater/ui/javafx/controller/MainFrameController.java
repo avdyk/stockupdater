@@ -228,7 +228,7 @@ public class MainFrameController implements Initializable {
 
   @FXML
   void save(final ActionEvent actionEvent) {
-    final String outputFilename = getOutputFilename();
+    final String outputFilename = getOutputFilename(".xlsx");
     LOG.info("save in file: {}", outputFilename);
     try (OutputStream outStream = Files.newOutputStream(
         Paths.get(outputFilename), StandardOpenOption.WRITE)) {
@@ -242,7 +242,7 @@ public class MainFrameController implements Initializable {
 
   @FXML
   void saveCSV(final ActionEvent actionEvent) {
-    final String outputFilename = getOutputFilename();
+    final String outputFilename = getOutputFilename(".csv");
     LOG.info("save in CSV file {}", outputFilename);
     try (BufferedWriter out = new BufferedWriter(Files.newBufferedWriter(
         Paths.get(outputFilename), StandardOpenOption.WRITE))) {
@@ -253,10 +253,9 @@ public class MainFrameController implements Initializable {
     }
   }
 
-  String getOutputFilename() {
+  String getOutputFilename(final String suffixe) {
     final String filename = this.mainPresentationModel.getExcelFileIn();
     final String filenameWithoutTheDot = filename.substring(0, filename.lastIndexOf('.'));
-    final String suffixe = filename.substring(filename.lastIndexOf('.'));
     final String bySeconds = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
     final String outputFilename = String.format("%s-%s%s", filenameWithoutTheDot, bySeconds, suffixe);
     final Path outPath = Paths.get(outputFilename);
