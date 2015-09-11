@@ -174,6 +174,34 @@ public class ArticleServiceImpl implements ArticleService {
   }
 
   @Override
+  public Set<Integer> findIdInAllColumnsInTheSheet(final long id) {
+    final Set<Integer> rows = new HashSet<>();
+    final Iterator<Row> rowIterator = this.selectedSheet.rowIterator();
+    assert rowIterator.hasNext();
+    // header
+    rowIterator.next();
+    while (rowIterator.hasNext()) {
+      final Row row = rowIterator.next();
+      boolean found = false;
+      final Iterator<Cell> cellIterator = row.cellIterator();
+      while (!found && cellIterator.hasNext()) {
+        final Cell cell = cellIterator.next();
+        final Integer lineNum = cell.getRowIndex();
+        if (cell.getCellType() == Cell.CELL_TYPE_NUMERIC || cell.getCellType() == Cell.CELL_TYPE_STRING) {
+          final Long numericCellValue = excelUtilService.getLongValueFromCell(cell);
+          if (numericCellValue != null) {
+            found = numericCellValue.equals(id);
+            if (found) {
+              rows.add(lineNum);
+            }
+          }
+        }
+      }
+    }
+    return rows;
+  }
+
+  @Override
   public void setSelectedLabelColumn(final String newValue) {
     this.selectedLabelColumn = newValue;
   }

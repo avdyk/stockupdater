@@ -38,6 +38,8 @@ public interface ArticleService {
 
   Map<Long, Set<Integer>> getIdsWithLineNumbersIndexes();
 
+  Set<Integer> findIdInAllColumnsInTheSheet(final long id);
+
   void setSelectedLabelColumn(final String newValue);
 
   String getSelectedLabelColumn();

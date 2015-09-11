@@ -31,7 +31,7 @@ public class ExcelUtilServiceImpl {
                 id = null;
             }
         } else {
-            LOG.warn("The cell at row {}, col {} is neither numeric or string", cell.getRowIndex(),
+            LOG.debug("The cell at row {}, col {} is neither numeric or string", cell.getRowIndex(),
                     cell.getColumnIndex());
             id = null;
         }

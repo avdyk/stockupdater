@@ -68,7 +68,12 @@ public class StockServiceImpl implements StockService {
     presentationModel.setLogOutput(titleMsg + ":\n");
     stock.forEach((id, quantity) -> {
       if (id != null && quantity != null) {
-        final Set<Integer> rows = inService.getIdsWithLineNumbersIndexes().get(id);
+        final Set<Integer> rows;
+        if (inService.getIdsWithLineNumbersIndexes().isEmpty()) {
+          rows = inService.findIdInAllColumnsInTheSheet(id);
+        } else {
+          rows = inService.getIdsWithLineNumbersIndexes().get(id);
+        }
         if (rows != null && !rows.isEmpty()) {
           updateStock(updateType, rows, quantity);
           final String label;
