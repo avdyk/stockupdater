@@ -96,7 +96,7 @@ public class ArticleServiceImpl implements ArticleService {
     } else {
       throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
     }
-    this.selectedColumn = null;
+    this.setSelectedColumn(null);
   }
 
   @Override
@@ -128,12 +128,8 @@ public class ArticleServiceImpl implements ArticleService {
 
   @Override
   public void setSelectedColumn(String columnName) {
-    if (StringUtils.isBlank(columnName)) {
-      throw new IllegalArgumentException(String.format("Illegal value for the column: %s", columnName));
-    } else {
-      if (!this.columnNames.contains(columnName)) {
-        throw new IllegalArgumentException(String.format("Column %s not found", columnName));
-      }
+    if (!StringUtils.isBlank(columnName) && !this.columnNames.contains(columnName)) {
+      throw new IllegalArgumentException(String.format("Column %s not found", columnName));
     }
     this.selectedColumn = columnName;
     // prepare index
@@ -144,21 +140,23 @@ public class ArticleServiceImpl implements ArticleService {
     rowIterator.next();
     while (rowIterator.hasNext()) {
       final Row row = rowIterator.next();
-      final Cell cell = row.getCell(columnNames.indexOf(selectedColumn));
-      if (cell != null) {
-        final Integer lineNum = cell.getRowIndex();
-        final Long id = excelUtilService.getLongValueFromCell(cell);
-        if (id != null) {
-          if (INDEXES.containsKey(id)) {
-            final Set<Integer> ids = INDEXES.get(id);
-            final boolean alreadyExists = ids.add(lineNum);
-            if (alreadyExists) {
-              LOG.warn("id '{}' exists at lines {}", id, Arrays.toString(ids.toArray()));
+      if (selectedColumn != null) {
+        final Cell cell = row.getCell(columnNames.indexOf(selectedColumn));
+        if (cell != null) {
+          final Integer lineNum = cell.getRowIndex();
+          final Long id = excelUtilService.getLongValueFromCell(cell);
+          if (id != null) {
+            if (INDEXES.containsKey(id)) {
+              final Set<Integer> ids = INDEXES.get(id);
+              final boolean alreadyExists = ids.add(lineNum);
+              if (alreadyExists) {
+                LOG.warn("id '{}' exists at lines {}", id, Arrays.toString(ids.toArray()));
+              }
+            } else {
+              final Set<Integer> ids = new HashSet<>();
+              ids.add(lineNum);
+              INDEXES.put(id, ids);
             }
-          } else {
-            final Set<Integer> ids = new HashSet<>();
-            ids.add(lineNum);
-            INDEXES.put(id, ids);
           }
         }
       }
