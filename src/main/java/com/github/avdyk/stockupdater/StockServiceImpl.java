@@ -1,8 +1,11 @@
 package com.github.avdyk.stockupdater;
 
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -10,9 +13,12 @@ import org.slf4j.MarkerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,7 +26,7 @@ import static java.time.LocalDateTime.*;
 
 /**
  * Service to compute the sotck with the workbooks.
- *
+ * <p>
  * Created by arnaud on 25/08/15.
  */
 @Service
@@ -113,6 +119,28 @@ public class StockServiceImpl implements StockService {
   @Override
   public void writeExcelWorkbook(final OutputStream stream) throws IOException {
     this.outService.getWorkbook().write(stream);
+  }
+
+  @Override
+  public void writeCSV(final BufferedWriter out) throws IOException {
+    final XSSFSheet sheet = this.outService.getWorkbook().getSheet(this.outService.getSelectedSheetName());
+    final Iterator<Row> rowIterator = sheet.rowIterator();
+    while (rowIterator.hasNext()) {
+      final Row row = rowIterator.next();
+      final Iterator<Cell> cellIterator = row.cellIterator();
+      final StringBuilder s = new StringBuilder();
+      while (cellIterator.hasNext()) {
+        final Cell cell = cellIterator.next();
+        s.append(cell.getStringCellValue())
+            .append(';');
+      }
+      if (s.length() > 1) {
+        s.deleteCharAt(s.length() - 1);
+      }
+      out.write(s.toString());
+      out.newLine();
+    }
+    out.flush();
   }
 
   @Override

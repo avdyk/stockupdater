@@ -2,6 +2,7 @@ package com.github.avdyk.stockupdater;
 
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
@@ -28,5 +29,13 @@ public interface StockService {
    * @throws java.io.IOException if a problem with the stream.
    */
   void writeExcelWorkbook(OutputStream stream) throws IOException;
+
+  /**
+   * Save the selected sheet to a CSV file. The stream will not be closed but it'll be fulshed!
+   *
+   * @param stream the stream.
+   * @throws IOException if a problem with the stream.
+   */
+  void writeCSV(BufferedWriter stream) throws IOException;
 
 }
