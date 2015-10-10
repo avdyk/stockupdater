@@ -64,5 +64,7 @@
               GridPane.rowIndex="11" GridPane.rowSpan="5"/>
     <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER"
             GridPane.rowIndex="16" GridPane.valignment="CENTER"/>
+    <Label fx:id="serviceLogLabel" GridPane.rowIndex="17"/>
+    <ProgressBar fx:id="serviceProgress" GridPane.rowIndex="17" GridPane.columnIndex="1"/>
   </GridPane>
 </StackPane>

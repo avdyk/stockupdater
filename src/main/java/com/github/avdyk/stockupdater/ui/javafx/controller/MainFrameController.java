@@ -4,6 +4,7 @@ import com.github.avdyk.stockupdater.StockCompute;
 import com.github.avdyk.stockupdater.StockService;
 import com.github.avdyk.stockupdater.UpdateType;
 import com.github.avdyk.stockupdater.conf.ConfImpl;
+import com.github.avdyk.stockupdater.ui.javafx.FXService;
 import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import javafx.application.Platform;
@@ -12,12 +13,14 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
@@ -30,6 +33,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
+import java.awt.*;
+import java.awt.Cursor;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -39,6 +44,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 /**
  * Controller for the main frame.
@@ -56,6 +62,8 @@ public class MainFrameController implements Initializable {
   private MainPresentationModel mainPresentationModel;
   @Autowired
   private StockService stockService;
+
+  private FXService fxService = new FXService();
 
   private Stage stage;
   @FXML
@@ -90,8 +98,13 @@ public class MainFrameController implements Initializable {
   private Button saveCSVButton;
   @FXML
   private Button saveModifiedRowsToCSVButton;
+  @FXML
+  private Label serviceLogLabel;
+  @FXML
+  private ProgressIndicator progressIndicator;
 
   private Map<Long, Long> stockComputed;
+  private boolean cursorBinded;
 
   public Parent getView() {
     return root;
@@ -163,6 +176,9 @@ public class MainFrameController implements Initializable {
 
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
+    // threaded service bindings
+    serviceLogLabel.textProperty().bind(fxService.stateProperty().asString());
+    computeButton.disableProperty().bind(fxService.runningProperty());
   }
 
   @FXML
@@ -172,19 +188,27 @@ public class MainFrameController implements Initializable {
         .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.in.excel.file.dialog.title"));
     mainPresentationModel.setExcelFileIn(fileName);
     if (fileName != null && StringUtils.isNotBlank(fileName)) {
-      try (InputStream instream = Files.newInputStream(Paths.get(fileName))) {
-        final XSSFWorkbook wb = new XSSFWorkbook(instream);
-        this.stockService.getInService().setWorkbook(wb);
-        this.stockService.getIn2Service().setWorkbook(wb);
-        this.stockService.getStockService().setWorkbook(wb);
-        this.stockService.getOutService().setWorkbook(wb);
-        mainPresentationModel
-            .setExcelFileInSheetNames(
-                FXCollections.observableArrayList(this.stockService.getInService().getSheetsName()));
-        mainPresentationModel.setComputed(false);
-      } catch (IOException e) {
-        LOG.warn("File not found", e);
-      }
+      prepareCursorBindings();
+      fxService.setTask(new Task<Void>() {
+        @Override
+        protected Void call() throws Exception {
+          try (InputStream instream = Files.newInputStream(Paths.get(fileName))) {
+            final XSSFWorkbook wb = new XSSFWorkbook(instream);
+            stockService.getInService().setWorkbook(wb);
+            stockService.getIn2Service().setWorkbook(wb);
+            stockService.getStockService().setWorkbook(wb);
+            stockService.getOutService().setWorkbook(wb);
+            mainPresentationModel
+                .setExcelFileInSheetNames(
+                    FXCollections.observableArrayList(stockService.getInService().getSheetsName()));
+            mainPresentationModel.setComputed(false);
+          } catch (IOException e) {
+            LOG.warn("File not found", e);
+          }
+          return null;
+        }
+      });
+      fxService.restart();
     }
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
@@ -293,7 +317,6 @@ public class MainFrameController implements Initializable {
   void compute(final ActionEvent actionEvent) {
     LOG.info("compute");
     stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
-    mainPresentationModel.setComputed(true);
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
   }
@@ -332,8 +355,7 @@ public class MainFrameController implements Initializable {
   }
 
   @FXML
-  @SuppressWarnings("unused")
-    // called by fxml
+  @SuppressWarnings("unused") // called by fxml
   void saveModifiedRowsToCSV(final ActionEvent actionEvent) {
     final String outputFilename = getOutputFilename("-modified.csv");
     LOG.info("save in modified rows to CSV file {}", outputFilename);
@@ -392,6 +414,20 @@ public class MainFrameController implements Initializable {
 
   public void setStage(final Stage stage) {
     this.stage = stage;
+  }
+
+  private void prepareCursorBindings() {
+    if (!cursorBinded
+        && stage != null
+        && stage.getScene() != null
+        && stage.getScene().getRoot() != null
+        && stage.getScene().getRoot().cursorProperty() != null) {
+      stage.getScene().getRoot().cursorProperty()
+          .bind(Bindings.when(fxService.runningProperty())
+              .then(javafx.scene.Cursor.WAIT)
+              .otherwise(javafx.scene.Cursor.DEFAULT));
+      cursorBinded = true;
+    }
   }
 
 }
