@@ -313,6 +313,23 @@ public class MainFrameController implements Initializable {
     Platform.runLater(scanTextField::requestFocus);
   }
 
+  @FXML
+  @SuppressWarnings("unused")
+    // called by fxml
+  void saveModifiedRowsToCSV(final ActionEvent actionEvent) {
+    final String outputFilename = getOutputFilename("-modified.csv");
+    LOG.info("save in modified rows to CSV file {}", outputFilename);
+    try (BufferedWriter out = new BufferedWriter(Files.newBufferedWriter(
+        Paths.get(outputFilename), StandardOpenOption.WRITE))) {
+      stockService.writeModifiedRowsToCSV(out);
+      out.flush();
+    } catch (IOException e) {
+      LOG.error("Problem writing file {}", outputFilename, e);
+    }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
+  }
+
   String getOutputFilename(final String suffixe) {
     final String filename = this.mainPresentationModel.getExcelFileIn();
     final String filenameWithoutTheDot = filename.substring(0, filename.lastIndexOf('.'));

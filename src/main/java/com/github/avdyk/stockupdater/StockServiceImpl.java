@@ -46,6 +46,8 @@ public class StockServiceImpl implements StockService {
   @Autowired
   private ExcelUtilServiceImpl excelUtilService;
 
+  private Set<Integer> modifiedRows = new HashSet<>();
+
   @Override
   public void updateStock(final UpdateType updateType,
                           final Map<Long, Long> stock,
@@ -60,6 +62,7 @@ public class StockServiceImpl implements StockService {
     if (updateType == null) {
       throw new NullPointerException("Update Type cannot be 'null'");
     }
+    modifiedRows.clear();
     final String titleMsg = String.format("Updating stock at %s",
         now().format(dateFormatter));
     LOG.info(titleMsg);
@@ -149,14 +152,17 @@ public class StockServiceImpl implements StockService {
           switch (updateType) {
             case ADD:
               newValue = originalStock + quantity;
+              modifiedRows.add(row);
               break;
             case SUBSTRACT:
               newValue = originalStock - quantity;
+              modifiedRows.add(row);
               break;
             case TEST:
             case UPDATE:
             default:
               newValue = quantity;
+              modifiedRows.add(row);
           }
           if (updateType != UpdateType.TEST && cell != null) {
             cell.setCellValue(newValue);
@@ -176,42 +182,59 @@ public class StockServiceImpl implements StockService {
     final Iterator<Row> rowIterator = sheet.rowIterator();
     while (rowIterator.hasNext()) {
       final Row row = rowIterator.next();
-      final Iterator<Cell> cellIterator = row.cellIterator();
-      final StringBuilder s = new StringBuilder();
-      while (cellIterator.hasNext()) {
-        final Cell cell = cellIterator.next();
-        final String value;
-        switch (cell.getCellType()) {
-          case Cell.CELL_TYPE_NUMERIC:
-            value = String.valueOf(cell.getNumericCellValue());
-            break;
-          case Cell.CELL_TYPE_STRING:
-            value = cell.getStringCellValue();
-            break;
-          case Cell.CELL_TYPE_FORMULA:
-            value = cell.getCellFormula();
-            break;
-          case Cell.CELL_TYPE_BOOLEAN:
-            value = String.valueOf(cell.getBooleanCellValue());
-            break;
-          case Cell.CELL_TYPE_ERROR:
-            value = String.format("Error #%d", cell.getErrorCellValue());
-            break;
-          case Cell.CELL_TYPE_BLANK:
-          default:
-            value = "";
-            break;
-        }
-        s.append(value)
-            .append(';');
-      }
-      if (s.length() > 1) {
-        s.deleteCharAt(s.length() - 1);
-      }
-      out.write(s.toString());
+      final String s = rowToString(row);
+      out.write(s);
       out.newLine();
     }
     out.flush();
+  }
+
+  @Override
+  public void writeModifiedRowsToCSV(final BufferedWriter out) throws IOException {
+    final XSSFSheet sheet = this.outService.getWorkbook().getSheet(this.outService.getSelectedSheetName());
+    for (final Integer r : modifiedRows) {
+      final Row row = sheet.getRow(r);
+      final String s = rowToString(row);
+      out.write(s);
+      out.newLine();
+    }
+    out.flush();
+  }
+
+  private String rowToString(final Row row) {
+    final Iterator<Cell> cellIterator = row.cellIterator();
+    final StringBuilder s = new StringBuilder();
+    while (cellIterator.hasNext()) {
+      final Cell cell = cellIterator.next();
+      final String value;
+      switch (cell.getCellType()) {
+        case Cell.CELL_TYPE_NUMERIC:
+          value = String.valueOf(cell.getNumericCellValue());
+          break;
+        case Cell.CELL_TYPE_STRING:
+          value = cell.getStringCellValue();
+          break;
+        case Cell.CELL_TYPE_FORMULA:
+          value = cell.getCellFormula();
+          break;
+        case Cell.CELL_TYPE_BOOLEAN:
+          value = String.valueOf(cell.getBooleanCellValue());
+          break;
+        case Cell.CELL_TYPE_ERROR:
+          value = String.format("Error #%d", cell.getErrorCellValue());
+          break;
+        case Cell.CELL_TYPE_BLANK:
+        default:
+          value = "";
+          break;
+      }
+      s.append(value)
+          .append(';');
+    }
+    if (s.length() > 1) {
+      s.deleteCharAt(s.length() - 1);
+    }
+    return s.toString();
   }
 
   @Override

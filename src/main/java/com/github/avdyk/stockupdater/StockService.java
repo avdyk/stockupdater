@@ -40,4 +40,12 @@ public interface StockService {
    */
   void writeCSV(BufferedWriter stream) throws IOException;
 
+  /**
+   * Save the modified rows to a CSV file. The stream will not be closed but it'll be fulshed!
+   *
+   * @param stream the stream.
+   * @throws IOException if a problem with the stream.
+   */
+  void writeModifiedRowsToCSV(BufferedWriter stream) throws IOException;
+
 }
