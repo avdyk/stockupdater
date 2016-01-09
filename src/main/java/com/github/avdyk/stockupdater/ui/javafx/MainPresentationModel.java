@@ -39,7 +39,7 @@ public class MainPresentationModel {
               Bindings.or(updateType.isEqualTo(UpdateType.ADD), updateType.isEqualTo(UpdateType.SUBSTRACT)),
               Bindings.and(out.isNotEmpty(), stockFile.isNotEmpty()).and(stockColumn.isNotEmpty()))
       ));
-  private BooleanProperty saveable = new SimpleBooleanProperty();
+  private BooleanProperty computed = new SimpleBooleanProperty();
   private StringProperty logOutput = new SimpleStringProperty();
 
   public String getExcelFileIn() {
@@ -232,15 +232,15 @@ public class MainPresentationModel {
     return computable;
   }
 
-  public boolean getSaveable() {
-    return saveable.get();
+  public boolean getComputed() {
+    return computed.get();
   }
 
-  public void setSaveable(boolean saveable) {
-    this.saveable.set(saveable);
+  public void setComputed(boolean computed) {
+    this.computed.set(computed);
   }
 
-  public BooleanProperty saveableProperty() {
-    return saveable;
+  public BooleanProperty computedProperty() {
+    return computed;
   }
 }

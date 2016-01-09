@@ -154,8 +154,12 @@ public class MainFrameController implements Initializable {
     logOutput.textProperty().bind(mainPresentationModel.logOutputProperty());
     // registrer the appender
 
-    // bindings to button save and button compute enable
+    // bindings to button compute enable
     computeButton.disableProperty().bind(Bindings.not(mainPresentationModel.computableProperty()));
+    // bindings to button save
+    saveButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
+    saveCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
+    saveModifiedRowsToCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
 
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
@@ -177,6 +181,7 @@ public class MainFrameController implements Initializable {
         mainPresentationModel
             .setExcelFileInSheetNames(
                 FXCollections.observableArrayList(this.stockService.getInService().getSheetsName()));
+        mainPresentationModel.setComputed(false);
       } catch (IOException e) {
         LOG.warn("File not found", e);
       }
@@ -200,6 +205,7 @@ public class MainFrameController implements Initializable {
           LOG.debug("barCode: {}; stock: {}", barCode, stockComputed.get(barCode));
         }
       }
+      mainPresentationModel.setComputed(false);
     } catch (IOException e) {
       LOG.warn("Une exception a eu lieu", e);
     }
@@ -287,6 +293,7 @@ public class MainFrameController implements Initializable {
   void compute(final ActionEvent actionEvent) {
     LOG.info("compute");
     stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
+    mainPresentationModel.setComputed(true);
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
   }
