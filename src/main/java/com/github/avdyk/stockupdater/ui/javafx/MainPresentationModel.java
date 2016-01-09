@@ -31,7 +31,6 @@ public class MainPresentationModel {
   private ListProperty<String> outColumns = new SimpleListProperty<>();
   private StringProperty out = new SimpleStringProperty();
   private BooleanBinding computable = Bindings.and(excelFileIn.isNotEmpty(), sheetNameIn.isNotEmpty())
-      .and(in.isNotEmpty())
       .and(Bindings.or(
           Bindings.and(updateType.isEqualTo(UpdateType.UPDATE),
               Bindings.and(out.isNotEmpty(), stockFile.isNotEmpty())),
