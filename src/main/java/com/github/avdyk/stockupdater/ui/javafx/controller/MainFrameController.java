@@ -7,6 +7,7 @@ import com.github.avdyk.stockupdater.conf.ConfImpl;
 import com.github.avdyk.stockupdater.ui.javafx.JavaFxControllerFactory;
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -80,6 +82,14 @@ public class MainFrameController implements Initializable {
   private TextField scanTextField;
   @FXML
   private TextArea logOutput;
+  @FXML
+  private Button computeButton;
+  @FXML
+  private Button saveButton;
+  @FXML
+  private Button saveCSVButton;
+  @FXML
+  private Button saveModifiedRowsToCSVButton;
 
   private Map<Long, Long> stockComputed;
 
@@ -144,7 +154,8 @@ public class MainFrameController implements Initializable {
     logOutput.textProperty().bind(mainPresentationModel.logOutputProperty());
     // registrer the appender
 
-    // TODO bindings to button save and button compute enable
+    // bindings to button save and button compute enable
+    computeButton.disableProperty().bind(Bindings.not(mainPresentationModel.computableProperty()));
 
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);

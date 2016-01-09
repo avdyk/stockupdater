@@ -1,7 +1,10 @@
 package com.github.avdyk.stockupdater.ui.javafx;
 
 import com.github.avdyk.stockupdater.UpdateType;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.collections.ObservableList;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +30,15 @@ public class MainPresentationModel {
   private StringProperty stockColumn = new SimpleStringProperty();
   private ListProperty<String> outColumns = new SimpleListProperty<>();
   private StringProperty out = new SimpleStringProperty();
-  private BooleanProperty computable = new SimpleBooleanProperty();
+  private BooleanBinding computable = Bindings.and(excelFileIn.isNotEmpty(), sheetNameIn.isNotEmpty())
+      .and(in.isNotEmpty())
+      .and(Bindings.or(
+          Bindings.and(updateType.isEqualTo(UpdateType.UPDATE),
+              Bindings.and(out.isNotEmpty(), stockFile.isNotEmpty())),
+          Bindings.and(
+              Bindings.or(updateType.isEqualTo(UpdateType.ADD), updateType.isEqualTo(UpdateType.SUBSTRACT)),
+              Bindings.and(out.isNotEmpty(), stockFile.isNotEmpty()).and(stockColumn.isNotEmpty()))
+      ));
   private BooleanProperty saveable = new SimpleBooleanProperty();
   private StringProperty logOutput = new SimpleStringProperty();
 
@@ -213,15 +224,11 @@ public class MainPresentationModel {
     return logOutput;
   }
 
-  public boolean getComputable() {
+  public boolean isComputable() {
     return computable.get();
   }
 
-  public void setComputable(boolean computable) {
-    this.computable.set(computable);
-  }
-
-  public BooleanProperty computableProperty() {
+  public ObservableBooleanValue computableProperty() {
     return computable;
   }
 
