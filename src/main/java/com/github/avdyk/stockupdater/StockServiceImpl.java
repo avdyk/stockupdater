@@ -1,6 +1,7 @@
 package com.github.avdyk.stockupdater;
 
 import com.github.avdyk.stockupdater.ui.javafx.MainPresentationModel;
+import javafx.application.Platform;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -23,7 +24,7 @@ import java.util.*;
 import static java.time.LocalDateTime.now;
 
 /**
- * Service to compute the sotck with the workbooks.
+ * Service to compute the stock with the workbooks.
  * <p>
  * Created by arnaud on 25/08/15.
  */
@@ -45,64 +46,22 @@ public class StockServiceImpl implements StockService {
   private ArticleService outService;
   @Autowired
   private ExcelUtilServiceImpl excelUtilService;
+  @Autowired
+  private MainPresentationModel mainPresentationModel;
+  private Map<Long, Long> stock;
 
   private Set<Integer> modifiedRows = new HashSet<>();
 
   @Override
-  public void updateStock(final UpdateType updateType,
-                          final Map<Long, Long> stock,
-                          final MainPresentationModel presentationModel) {
-
+  public void setStock(final Map<Long, Long> stock) {
     if (stock == null) {
       throw new NullPointerException("Stock cannot be 'null'");
     }
     if (stock.isEmpty()) {
       throw new IllegalArgumentException("Stock cannot be empty");
     }
-    if (updateType == null) {
-      throw new NullPointerException("Update Type cannot be 'null'");
-    }
+    this.stock = stock;
     modifiedRows.clear();
-    final String titleMsg = String.format("Updating stock at %s",
-        now().format(dateFormatter));
-    LOG.info(titleMsg);
-    // TODO try to use a log appender
-    presentationModel.setLogOutput(titleMsg + ":\n");
-    stock.forEach((id, quantity) -> {
-      if (id != null && quantity != null) {
-        final Set<Integer> rows = new HashSet<>();
-        if (inService.getIdsWithLineNumbersIndexes().isEmpty()) {
-          addIfNotEmpty(rows, inService.findIdInAllColumnsInTheSheet(id));
-        } else {
-          addIfNotEmpty(rows, inService.getIdsWithLineNumbersIndexes().get(id));
-          // maybe we'll find some articles in the secondary column
-          addIfNotEmpty(rows, in2Service.getIdsWithLineNumbersIndexes().get(id));
-        }
-        if (!rows.isEmpty()) {
-          updateStock(updateType, rows, quantity);
-          final String label;
-          if (presentationModel.getLabelColumn() != null) {
-            final int labelColIndex = inService.getColumnsName().indexOf(this.inService.getSelectedLabelColumn());
-            final StringJoiner joiner = new StringJoiner(";", "(", ")");
-            for (int r : rows) {
-              joiner.add(inService.getSelectedSheet().getRow(r).getCell(labelColIndex).getStringCellValue());
-            }
-            label = joiner.toString();
-          } else {
-            label = "NO LABEL SELECTED";
-          }
-          final String msg = String.format("Article found %s: %d", label, id);
-          LOG.info(FOUND, msg);
-          // TODO try to use a log appender
-          presentationModel.setLogOutput(presentationModel.getLogOutput() + msg + "\n");
-        } else {
-          final String msg = String.format("Article not found: %d", id);
-          LOG.warn(NOT_FOUND, msg);
-          // TODO try to use a log appender
-          presentationModel.setLogOutput(presentationModel.getLogOutput() + msg + "\n");
-        }
-      }
-    });
   }
 
   private void addIfNotEmpty(final Set<Integer> rows, final Set<Integer> tempRows) {
@@ -257,4 +216,49 @@ public class StockServiceImpl implements StockService {
     return outService;
   }
 
+  @Override
+  public Void call() throws Exception {
+    modifiedRows.clear();
+    final String titleMsg = String.format("Updating stock at %s",
+        now().format(dateFormatter));
+    LOG.info(titleMsg);
+    // TODO try to use a log appender
+    Platform.runLater(() -> mainPresentationModel.setLogOutput(titleMsg + ":\n"));
+    stock.forEach((id, quantity) -> {
+      if (id != null && quantity != null) {
+        final Set<Integer> rows = new HashSet<>();
+        if (inService.getIdsWithLineNumbersIndexes().isEmpty()) {
+          addIfNotEmpty(rows, inService.findIdInAllColumnsInTheSheet(id));
+        } else {
+          addIfNotEmpty(rows, inService.getIdsWithLineNumbersIndexes().get(id));
+          // maybe we'll find some articles in the secondary column
+          addIfNotEmpty(rows, in2Service.getIdsWithLineNumbersIndexes().get(id));
+        }
+        if (!rows.isEmpty()) {
+          updateStock(mainPresentationModel.getUpdateType(), rows, quantity);
+          final String label;
+          if (mainPresentationModel.getLabelColumn() != null) {
+            final int labelColIndex = inService.getColumnsName().indexOf(this.inService.getSelectedLabelColumn());
+            final StringJoiner joiner = new StringJoiner(";", "(", ")");
+            for (int r : rows) {
+              joiner.add(inService.getSelectedSheet().getRow(r).getCell(labelColIndex).getStringCellValue());
+            }
+            label = joiner.toString();
+          } else {
+            label = "NO LABEL SELECTED";
+          }
+          final String msg = String.format("Article found %s: %d", label, id);
+          LOG.info(FOUND, msg);
+          // TODO try to use a log appender
+          Platform.runLater(() -> mainPresentationModel.setLogOutput(mainPresentationModel.getLogOutput() + msg + "\n"));
+        } else {
+          final String msg = String.format("Article not found: %d", id);
+          LOG.warn(NOT_FOUND, msg);
+          // TODO try to use a log appender
+          Platform.runLater(() -> mainPresentationModel.setLogOutput(mainPresentationModel.getLogOutput() + msg + "\n"));
+        }
+      }
+    });
+    return null;
+  }
 }

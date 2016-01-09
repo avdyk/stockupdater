@@ -13,9 +13,8 @@ public interface StockCompute {
 
   /**
    * Retourne une map des codes barre et de leur stock.
+   *  @param lines les lignes de codes barre.
    *
-   * @param lines les lignes de codes barre.
-   * @return un stream des entrées codeBarre et stock.
    */
   Map<Long, Long> stockStream(final Stream<String> lines);
 }

@@ -19,10 +19,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.*;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -33,8 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.awt.*;
-import java.awt.Cursor;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
@@ -44,7 +38,6 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 
 /**
  * Controller for the main frame.
@@ -101,7 +94,7 @@ public class MainFrameController implements Initializable {
   @FXML
   private Label serviceLogLabel;
   @FXML
-  private ProgressIndicator progressIndicator;
+  private ProgressBar serviceProgress;
 
   private Map<Long, Long> stockComputed;
   private boolean cursorBinded;
@@ -178,7 +171,7 @@ public class MainFrameController implements Initializable {
     Platform.runLater(scanTextField::requestFocus);
     // threaded service bindings
     serviceLogLabel.textProperty().bind(fxService.stateProperty().asString());
-    computeButton.disableProperty().bind(fxService.runningProperty());
+    serviceProgress.visibleProperty().bind(fxService.runningProperty());
   }
 
   @FXML
@@ -219,20 +212,28 @@ public class MainFrameController implements Initializable {
   void chooseStockTextFile(final ActionEvent actionEvent) {
     final String path = getPathFromUser(JavaFxControllerFactory
         .MAIN_FRAME_RESOURCE_BUNDLE.getString("ui.stock.file.dialog.title"));
-    mainPresentationModel.setStockFile(path);
-    try {
-      stockComputed =
-          stockCompute.stockStream(Files.lines(Paths.get(mainPresentationModel.getStockFile())));
-      if (LOG.isDebugEnabled()) {
-        LOG.debug("Résultat du stock");
-        for (final Long barCode : stockComputed.keySet()) {
-          LOG.debug("barCode: {}; stock: {}", barCode, stockComputed.get(barCode));
+    prepareCursorBindings();
+    fxService.setTask(new Task<Void>() {
+      @Override
+      protected Void call() throws Exception {
+        try {
+          updateMessage("Loading Stock file");
+          stockComputed =
+              stockCompute.stockStream(Files.lines(Paths.get(path)));
+          mainPresentationModel.setStockFile(path);
+          if (LOG.isDebugEnabled()) {
+            LOG.debug("Résultat du stock");
+            for (final Long barCode : stockComputed.keySet()) {
+              LOG.debug("barCode: {}; stock: {}", barCode, stockComputed.get(barCode));
+            }
+          }
+        } catch (IOException e) {
+          LOG.warn("Une exception a eu lieu", e);
         }
+        return null;
       }
-      mainPresentationModel.setComputed(false);
-    } catch (IOException e) {
-      LOG.warn("Une exception a eu lieu", e);
-    }
+    });
+    fxService.restart();
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
   }
@@ -316,7 +317,21 @@ public class MainFrameController implements Initializable {
   @SuppressWarnings("unused") // called by fxml
   void compute(final ActionEvent actionEvent) {
     LOG.info("compute");
-    stockService.updateStock(mainPresentationModel.getUpdateType(), stockComputed, mainPresentationModel);
+    stockService.setStock(stockComputed);
+    prepareCursorBindings();
+    fxService.setTask(new Task<Void>() {
+
+      @Override
+      protected Void call() throws Exception {
+        try {
+          stockService.call();
+        } catch (Exception e) {
+          LOG.error("Problem updating stock!", e);
+        }
+        return null;
+      }
+    });
+    fxService.restart();
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
   }
@@ -405,7 +420,7 @@ public class MainFrameController implements Initializable {
       final Map<Long, Long> lightStock = new HashMap<>();
       final Long id = Long.parseLong(scanText);
       lightStock.put(id, 1L);
-      stockService.updateStock(mainPresentationModel.getUpdateType(), lightStock, mainPresentationModel);
+      stockService.setStock(lightStock);
       this.scanTextField.clear();
       // request focus on the scan textfield
       Platform.runLater(scanTextField::requestFocus);
