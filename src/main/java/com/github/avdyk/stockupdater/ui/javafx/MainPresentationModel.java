@@ -91,7 +91,7 @@ public class MainPresentationModel {
     return out;
   }
 
-/*
+/* TODO multi selection list
   public ObservableList<String> getIn() {
     return in.get();
   }
