@@ -208,4 +208,7 @@
       </resource>
     </resources>
   </build>
+  <scm>
+    <developerConnection>scm:git:ssh://git@github.com:avdyk/stockupdater.git</developerConnection>
+  </scm>
 </project>
