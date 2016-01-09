@@ -18,12 +18,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
-import static java.time.LocalDateTime.*;
+import static java.time.LocalDateTime.now;
 
 /**
  * Service to compute the sotck with the workbooks.
@@ -40,6 +37,8 @@ public class StockServiceImpl implements StockService {
 
   @Autowired
   private ArticleService inService;
+  @Autowired
+  private ArticleService in2Service;
   @Autowired
   private ArticleService stockService;
   @Autowired
@@ -68,13 +67,15 @@ public class StockServiceImpl implements StockService {
     presentationModel.setLogOutput(titleMsg + ":\n");
     stock.forEach((id, quantity) -> {
       if (id != null && quantity != null) {
-        final Set<Integer> rows;
+        final Set<Integer> rows = new HashSet<>();
         if (inService.getIdsWithLineNumbersIndexes().isEmpty()) {
-          rows = inService.findIdInAllColumnsInTheSheet(id);
+          addIfNotEmpty(rows, inService.findIdInAllColumnsInTheSheet(id));
         } else {
-          rows = inService.getIdsWithLineNumbersIndexes().get(id);
+          addIfNotEmpty(rows, inService.getIdsWithLineNumbersIndexes().get(id));
+          // maybe we'll find some articles in the secondary column
+          addIfNotEmpty(rows, in2Service.getIdsWithLineNumbersIndexes().get(id));
         }
-        if (rows != null && !rows.isEmpty()) {
+        if (!rows.isEmpty()) {
           updateStock(updateType, rows, quantity);
           final String label;
           if (presentationModel.getLabelColumn() != null) {
@@ -99,6 +100,13 @@ public class StockServiceImpl implements StockService {
         }
       }
     });
+  }
+
+  private void addIfNotEmpty(final Set<Integer> rows, final Set<Integer> tempRows) {
+    assert rows != null;
+    if (tempRows != null && !tempRows.isEmpty()) {
+      rows.addAll(tempRows);
+    }
   }
 
   void updateStock(final UpdateType updateType, final Set<Integer> rows, final long quantity) {
@@ -209,6 +217,11 @@ public class StockServiceImpl implements StockService {
   @Override
   public ArticleService getInService() {
     return inService;
+  }
+
+  @Override
+  public ArticleService getIn2Service() {
+    return in2Service;
   }
 
   @Override

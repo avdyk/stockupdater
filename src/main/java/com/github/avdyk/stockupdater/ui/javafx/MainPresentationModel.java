@@ -1,14 +1,7 @@
 package com.github.avdyk.stockupdater.ui.javafx;
 
 import com.github.avdyk.stockupdater.UpdateType;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import org.springframework.stereotype.Component;
 
@@ -26,9 +19,11 @@ public class MainPresentationModel {
   private ListProperty<String> excelFileInSheetNames = new SimpleListProperty<>();
   private StringProperty sheetNameIn = new SimpleStringProperty();
   private ListProperty<String> inColumns = new SimpleListProperty<>();
+  private ListProperty<String> in2Columns = new SimpleListProperty<>();
   //  private ListProperty<String> in = new SimpleListProperty<>();
   private StringProperty labelColumn = new SimpleStringProperty();
   private StringProperty in = new SimpleStringProperty();
+  private StringProperty in2 = new SimpleStringProperty();
   private StringProperty stockColumn = new SimpleStringProperty();
   private ListProperty<String> outColumns = new SimpleListProperty<>();
   private StringProperty out = new SimpleStringProperty();
@@ -40,60 +35,60 @@ public class MainPresentationModel {
     return excelFileIn.get();
   }
 
-  public StringProperty excelFileInProperty() {
-    return excelFileIn;
-  }
-
   public void setExcelFileIn(String excelFileIn) {
     this.excelFileIn.set(excelFileIn);
+  }
+
+  public StringProperty excelFileInProperty() {
+    return excelFileIn;
   }
 
   public String getStockFile() {
     return stockFile.get();
   }
 
-  public StringProperty stockFileProperty() {
-    return stockFile;
-  }
-
   public void setStockFile(String stockFile) {
     this.stockFile.set(stockFile);
+  }
+
+  public StringProperty stockFileProperty() {
+    return stockFile;
   }
 
   public String getSheetNameIn() {
     return sheetNameIn.get();
   }
 
-  public StringProperty sheetNameInProperty() {
-    return sheetNameIn;
-  }
-
   public void setSheetNameIn(String sheetNameIn) {
     this.sheetNameIn.set(sheetNameIn);
+  }
+
+  public StringProperty sheetNameInProperty() {
+    return sheetNameIn;
   }
 
   public String getStockColumn() {
     return stockColumn.get();
   }
 
-  public StringProperty stockColumnProperty() {
-    return stockColumn;
-  }
-
   public void setStockColumn(String stockColumn) {
     this.stockColumn.set(stockColumn);
+  }
+
+  public StringProperty stockColumnProperty() {
+    return stockColumn;
   }
 
   public String getOut() {
     return out.get();
   }
 
-  public StringProperty outProperty() {
-    return out;
-  }
-
   public void setOut(String out) {
     this.out.set(out);
+  }
+
+  public StringProperty outProperty() {
+    return out;
   }
 
 /*
@@ -114,107 +109,131 @@ public class MainPresentationModel {
     return in.get();
   }
 
+  public void setIn(String in) {
+    this.in.set(in);
+  }
+
   public StringProperty inProperty() {
     return in;
   }
 
-  public void setIn(String in) {
-    this.in.set(in);
+  public String getIn2() {
+    return in2.get();
+  }
+
+  public void setIn2(String in2) {
+    this.in2.set(in2);
+  }
+
+  public StringProperty in2Property() {
+    return in2;
   }
 
   public ObservableList<String> getInColumns() {
     return inColumns.get();
   }
 
+  public void setInColumns(ObservableList<String> inColumns) {
+    this.inColumns.set(inColumns);
+  }
+
+  public ObservableList<String> getIn2Columns() {
+    return in2Columns.get();
+  }
+
+  public void setIn2Columns(ObservableList<String> inColumns) {
+    this.in2Columns.set(inColumns);
+  }
+
   public ListProperty<String> inColumnsProperty() {
     return inColumns;
   }
 
-  public void setInColumns(ObservableList<String> inColumns) {
-    this.inColumns.set(inColumns);
+  public ListProperty<String> in2ColumnsProperty() {
+    return in2Columns;
   }
 
   public String getLabelColumn() {
     return labelColumn.get();
   }
 
-  public StringProperty labelColumnProperty() {
-    return labelColumn;
-  }
-
   public void setLabelColumn(String labelColumn) {
     this.labelColumn.set(labelColumn);
+  }
+
+  public StringProperty labelColumnProperty() {
+    return labelColumn;
   }
 
   public ObservableList<String> getOutColumns() {
     return outColumns.get();
   }
 
-  public ListProperty<String> outColumnsProperty() {
-    return outColumns;
-  }
-
   public void setOutColumns(ObservableList<String> outColumns) {
     this.outColumns.set(outColumns);
+  }
+
+  public ListProperty<String> outColumnsProperty() {
+    return outColumns;
   }
 
   public ObservableList<String> getExcelFileInSheetNames() {
     return excelFileInSheetNames.get();
   }
 
-  public ListProperty<String> excelFileInSheetNamesProperty() {
-    return excelFileInSheetNames;
-  }
-
   public void setExcelFileInSheetNames(ObservableList<String> excelFileInSheetNames) {
     this.excelFileInSheetNames.set(excelFileInSheetNames);
+  }
+
+  public ListProperty<String> excelFileInSheetNamesProperty() {
+    return excelFileInSheetNames;
   }
 
   public UpdateType getUpdateType() {
     return updateType.get();
   }
 
-  public ObjectProperty<UpdateType> updateTypeProperty() {
-    return updateType;
-  }
-
   public void setUpdateType(UpdateType updateType) {
     this.updateType.set(updateType);
+  }
+
+  public ObjectProperty<UpdateType> updateTypeProperty() {
+    return updateType;
   }
 
   public String getLogOutput() {
     return logOutput.get();
   }
 
-  public StringProperty logOutputProperty() {
-    return logOutput;
-  }
-
   public void setLogOutput(String logOutput) {
     this.logOutput.set(logOutput);
+  }
+
+  public StringProperty logOutputProperty() {
+    return logOutput;
   }
 
   public boolean getComputable() {
     return computable.get();
   }
 
-  public BooleanProperty computableProperty() {
-    return computable;
-  }
-
   public void setComputable(boolean computable) {
     this.computable.set(computable);
+  }
+
+  public BooleanProperty computableProperty() {
+    return computable;
   }
 
   public boolean getSaveable() {
     return saveable.get();
   }
 
-  public BooleanProperty saveableProperty() {
-    return saveable;
-  }
-
   public void setSaveable(boolean saveable) {
     this.saveable.set(saveable);
+  }
+
+  public BooleanProperty saveableProperty() {
+    return saveable;
   }
 }

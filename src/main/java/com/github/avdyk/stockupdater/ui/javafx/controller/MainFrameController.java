@@ -15,7 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
@@ -65,6 +65,8 @@ public class MainFrameController implements Initializable {
   @FXML
   private ComboBox<String> inColumnsComboBox;
   @FXML
+  private ComboBox<String> in2ColumnsComboBox;
+  @FXML
   private ComboBox<String> labelColumnComboBox;
   @FXML
   private ComboBox<String> stockColumnsComboBox;
@@ -106,6 +108,11 @@ public class MainFrameController implements Initializable {
     inColumnsComboBox.valueProperty().addListener(this::inColumnSelected);
     // - selected in columns of excel in file
     inColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.inProperty());
+    // - populate column names from in sheet
+    in2ColumnsComboBox.setItems(mainPresentationModel.inColumnsProperty());
+    in2ColumnsComboBox.valueProperty().addListener(this::in2ColumnSelected);
+    // - selected in columns of excel in file
+    in2ColumnsComboBox.valueProperty().bindBidirectional(mainPresentationModel.in2Property());
     // - populate column names from in sheet
     labelColumnComboBox.setItems(mainPresentationModel.inColumnsProperty());
     labelColumnComboBox.valueProperty().addListener(this::labelColumnSelected);
@@ -153,6 +160,7 @@ public class MainFrameController implements Initializable {
       try (InputStream instream = Files.newInputStream(Paths.get(fileName))) {
         final XSSFWorkbook wb = new XSSFWorkbook(instream);
         this.stockService.getInService().setWorkbook(wb);
+        this.stockService.getIn2Service().setWorkbook(wb);
         this.stockService.getStockService().setWorkbook(wb);
         this.stockService.getOutService().setWorkbook(wb);
         mainPresentationModel
@@ -200,6 +208,7 @@ public class MainFrameController implements Initializable {
     if (newValue instanceof String && StringUtils.isNotBlank((String) newValue)) {
       final String sheetName = (String) newValue;
       this.stockService.getInService().setSelectedSheetName(sheetName);
+      this.stockService.getIn2Service().setSelectedSheetName(sheetName);
       this.stockService.getStockService().setSelectedSheetName(sheetName);
       this.stockService.getOutService().setSelectedSheetName(sheetName);
       List<String> cols = this.stockService.getInService().getColumnsName();
@@ -220,6 +229,16 @@ public class MainFrameController implements Initializable {
         this.stockService.getInService().getSelectedColumnName());
     if (newValue instanceof String) {
       this.stockService.getInService().setSelectedColumn((String) newValue);
+    }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
+  }
+
+  void in2ColumnSelected(final ObservableValue observableValue, final Object oldValue, final Object newValue) {
+    LOG.info("selected in2 column names: {}; in service: {}", newValue,
+        this.stockService.getIn2Service().getSelectedColumnName());
+    if (newValue instanceof String) {
+      this.stockService.getIn2Service().setSelectedColumn((String) newValue);
     }
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);

@@ -16,6 +16,8 @@ public interface StockService {
 
   ArticleService getInService();
 
+  ArticleService getIn2Service();
+
   ArticleService getStockService();
 
   ArticleService getOutService();
