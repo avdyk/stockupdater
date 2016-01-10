@@ -93,7 +93,7 @@ public class MainFrameController implements Initializable {
   @FXML
   private TextArea logOutput;
   @FXML
-  private Button computeButton;
+  private MenuItem executeInventoryMenuItem;
   @FXML
   private Button saveButton;
   @FXML
@@ -169,8 +169,8 @@ public class MainFrameController implements Initializable {
     logOutput.textProperty().bind(mainPresentationModel.logOutputProperty());
     // registrer the appender
 
-    // bindings to button compute enable
-    computeButton.disableProperty().bind(Bindings.not(mainPresentationModel.computableProperty()));
+    // bindings to button executeInventory enable
+    executeInventoryMenuItem.disableProperty().bind(Bindings.not(mainPresentationModel.computableProperty()));
     // bindings to button save
     saveButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
     saveCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
@@ -324,8 +324,8 @@ public class MainFrameController implements Initializable {
 
   @FXML
   @SuppressWarnings("unused") // called by fxml
-  void compute(final ActionEvent actionEvent) {
-    LOG.info("compute");
+  void executeInventory(final ActionEvent actionEvent) {
+    LOG.info("executeInventory");
     stockService.setStock(stockComputed);
     prepareCursorBindings();
     fxService.setTask(new Task<Void>() {

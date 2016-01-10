@@ -30,6 +30,16 @@
               </MenuItem>
             </items>
           </Menu>
+          <Menu text="%ui.menu.inventory" mnemonicParsing="true">
+            <items>
+              <MenuItem fx:id="executeInventoryMenuItem" mnemonicParsing="true" onAction="#executeInventory"
+                        text="%ui.menu.inventory.executeInventory">
+                <accelerator>
+                  <KeyCodeCombination alt="UP" code="e" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
+                </accelerator>
+              </MenuItem>
+            </items>
+          </Menu>
         </menus>
       </MenuBar>
     </top>
@@ -79,7 +89,6 @@
         <Label text="%ui.scan.label" GridPane.rowIndex="9"/>
         <TextField fx:id="scanTextField" GridPane.columnIndex="1" GridPane.rowIndex="9" onAction="#scanAction"/>
         <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10">
-          <Button fx:id="computeButton" mnemonicParsing="false" onAction="#compute" text="%ui.compute.button"/>
           <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="%ui.save.button"/>
           <Button fx:id="saveCSVButton" mnemonicParsing="false" onAction="#saveCSV" text="%ui.savecsv.button"/>
           <Button fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="false" onAction="#saveModifiedRowsToCSV"
