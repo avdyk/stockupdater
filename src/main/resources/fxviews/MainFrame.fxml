@@ -3,68 +3,90 @@
 <?language javascript?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.*?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/null"
            fx:controller="com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController">
-  <GridPane>
-    <columnConstraints>
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
-      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0" />
-    </columnConstraints>
-    <rowConstraints>
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-         <RowConstraints />
-         <RowConstraints />
-         <RowConstraints />
-         <RowConstraints />
-         <RowConstraints />
-         <RowConstraints />
-    </rowConstraints>
-    <Label text="%ui.in.excel.file.label" />
-    <Button mnemonicParsing="false" onAction="#chooseExcelIn" text="%ui.in.excel.file.button" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-    <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1" />
-    <Label text="%ui.in.excel.sheet.label" GridPane.rowIndex="1" />
-    <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-    <Label text="%ui.in.excel.column.label" GridPane.rowIndex="2" />
-    <ComboBox fx:id="inColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-    <Label text="%ui.in2.excel.column.label" GridPane.rowIndex="3"/>
-    <ComboBox fx:id="in2ColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-    <Label text="%ui.label.excel.column.label" GridPane.rowIndex="4"/>
-    <ComboBox fx:id="labelColumnComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-    <Label text="%ui.stock.excel.column.label" GridPane.rowIndex="5"/>
-    <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-    <Label text="%ui.out.excel.column.label" GridPane.rowIndex="6"/>
-    <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-    <Label text="%ui.update.type.label" GridPane.rowIndex="7"/>
-    <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
-    <Label text="%ui.stock.file.label" GridPane.rowIndex="8"/>
-    <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
-    <Button mnemonicParsing="false" onAction="#chooseStockTextFile" text="%ui.stock.file.button"
-            GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8" GridPane.valignment="CENTER"/>
-    <Label text="%ui.scan.label" GridPane.rowIndex="9"/>
-    <TextField fx:id="scanTextField" GridPane.columnIndex="1" GridPane.rowIndex="9" onAction="#scanAction"/>
-    <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10">
-      <Button fx:id="computeButton" mnemonicParsing="false" onAction="#compute" text="%ui.compute.button"/>
-      <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="%ui.save.button"/>
-      <Button fx:id="saveCSVButton" mnemonicParsing="false" onAction="#saveCSV" text="%ui.savecsv.button"/>
-      <Button fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="false" onAction="#saveModifiedRowsToCSV"
-              text="%ui.savemodifiedcsv.button"/>
-    </HBox>
-    <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
-              GridPane.rowIndex="11" GridPane.rowSpan="5"/>
-    <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER"
-            GridPane.rowIndex="16" GridPane.valignment="CENTER"/>
-    <Label fx:id="serviceLogLabel" GridPane.rowIndex="17"/>
-    <ProgressBar fx:id="serviceProgress" GridPane.rowIndex="17" GridPane.columnIndex="1"/>
-  </GridPane>
+  <BorderPane>
+    <top>
+      <MenuBar id="menuBar" fx:id="menuBar">
+        <menus>
+          <Menu text="%ui.menu.file" mnemonicParsing="true">
+            <items>
+              <MenuItem fx:id="accountMenuItem" text="%ui.menu.file.quit" onAction="#quit">
+                <accelerator>
+                  <KeyCodeCombination alt="UP" code="q" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                </accelerator>
+              </MenuItem>
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+    </top>
+    <center>
+      <GridPane>
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0"/>
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+          <RowConstraints/>
+        </rowConstraints>
+        <Label text="%ui.in.excel.file.label"/>
+        <Button mnemonicParsing="false" onAction="#chooseExcelIn" text="%ui.in.excel.file.button"
+                GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER"/>
+        <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1"/>
+        <Label text="%ui.in.excel.sheet.label" GridPane.rowIndex="1"/>
+        <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+        <Label text="%ui.in.excel.column.label" GridPane.rowIndex="2"/>
+        <ComboBox fx:id="inColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+        <Label text="%ui.in2.excel.column.label" GridPane.rowIndex="3"/>
+        <ComboBox fx:id="in2ColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+        <Label text="%ui.label.excel.column.label" GridPane.rowIndex="4"/>
+        <ComboBox fx:id="labelColumnComboBox" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+        <Label text="%ui.stock.excel.column.label" GridPane.rowIndex="5"/>
+        <ComboBox fx:id="stockColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+        <Label text="%ui.out.excel.column.label" GridPane.rowIndex="6"/>
+        <ComboBox fx:id="outColumnsComboBox" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+        <Label text="%ui.update.type.label" GridPane.rowIndex="7"/>
+        <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+        <Label text="%ui.stock.file.label" GridPane.rowIndex="8"/>
+        <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
+        <Button mnemonicParsing="false" onAction="#chooseStockTextFile" text="%ui.stock.file.button"
+                GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8"
+                GridPane.valignment="CENTER"/>
+        <Label text="%ui.scan.label" GridPane.rowIndex="9"/>
+        <TextField fx:id="scanTextField" GridPane.columnIndex="1" GridPane.rowIndex="9" onAction="#scanAction"/>
+        <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10">
+          <Button fx:id="computeButton" mnemonicParsing="false" onAction="#compute" text="%ui.compute.button"/>
+          <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="%ui.save.button"/>
+          <Button fx:id="saveCSVButton" mnemonicParsing="false" onAction="#saveCSV" text="%ui.savecsv.button"/>
+          <Button fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="false" onAction="#saveModifiedRowsToCSV"
+                  text="%ui.savemodifiedcsv.button"/>
+        </HBox>
+        <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
+                  GridPane.rowIndex="11" GridPane.rowSpan="5"/>
+        <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER"
+                GridPane.rowIndex="16" GridPane.valignment="CENTER"/>
+        <Label fx:id="serviceLogLabel" GridPane.rowIndex="17"/>
+        <ProgressBar fx:id="serviceProgress" GridPane.rowIndex="17" GridPane.columnIndex="1"/>
+      </GridPane>
+    </center>
+  </BorderPane>
 </StackPane>

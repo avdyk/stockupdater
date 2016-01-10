@@ -62,6 +62,15 @@ public class MainFrameController implements Initializable {
   @FXML
   private StackPane root;
   @FXML
+  private MenuBar menuBar;
+  @FXML
+  private MenuItem fullScreenMenuItem;
+  @FXML
+  private MenuItem musicPlayerMenuItem;
+  @FXML
+  private MenuItem accountMenuItem;
+
+  @FXML
   private TextField excelFileInTextField;
   @FXML
   private ComboBox<String> inSheetComboBox;
@@ -443,6 +452,12 @@ public class MainFrameController implements Initializable {
               .otherwise(javafx.scene.Cursor.DEFAULT));
       cursorBinded = true;
     }
+  }
+
+  @FXML
+  public void quit() {
+    LOG.info("Quit");
+    stage.close();
   }
 
 }
