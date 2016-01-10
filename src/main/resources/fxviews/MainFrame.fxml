@@ -15,7 +15,12 @@
             <items>
               <MenuItem fx:id="accountMenuItem" text="%ui.menu.file.quit" onAction="#quit">
                 <accelerator>
-                  <KeyCodeCombination alt="UP" code="q" control="DOWN" meta="UP" shift="UP" shortcut="UP"/>
+                  <KeyCodeCombination alt="UP" code="q" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
+                </accelerator>
+              </MenuItem>
+              <MenuItem mnemonicParsing="true" onAction="#chooseExcelIn" text="%ui.in.excel.file.button">
+                <accelerator>
+                  <KeyCodeCombination alt="UP" code="o" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
                 </accelerator>
               </MenuItem>
             </items>
@@ -49,8 +54,6 @@
           <RowConstraints/>
         </rowConstraints>
         <Label text="%ui.in.excel.file.label"/>
-        <Button mnemonicParsing="false" onAction="#chooseExcelIn" text="%ui.in.excel.file.button"
-                GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER"/>
         <TextField fx:id="excelFileInTextField" editable="false" GridPane.columnIndex="1"/>
         <Label text="%ui.in.excel.sheet.label" GridPane.rowIndex="1"/>
         <ComboBox fx:id="inSheetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
