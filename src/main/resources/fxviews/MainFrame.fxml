@@ -13,14 +13,19 @@
         <menus>
           <Menu text="%ui.menu.file" mnemonicParsing="true">
             <items>
-              <MenuItem fx:id="accountMenuItem" text="%ui.menu.file.quit" onAction="#quit">
-                <accelerator>
-                  <KeyCodeCombination alt="UP" code="q" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
-                </accelerator>
-              </MenuItem>
               <MenuItem mnemonicParsing="true" onAction="#chooseExcelIn" text="%ui.in.excel.file.button">
                 <accelerator>
                   <KeyCodeCombination alt="UP" code="o" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
+                </accelerator>
+              </MenuItem>
+              <MenuItem mnemonicParsing="true" onAction="#chooseStockTextFile" text="%ui.stock.file.button">
+                <accelerator>
+                  <KeyCodeCombination alt="UP" code="o" control="UP" meta="DOWN" shift="DOWN" shortcut="UP"/>
+                </accelerator>
+              </MenuItem>
+              <MenuItem fx:id="accountMenuItem" text="%ui.menu.file.quit" onAction="#quit">
+                <accelerator>
+                  <KeyCodeCombination alt="UP" code="q" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
                 </accelerator>
               </MenuItem>
             </items>
@@ -71,9 +76,6 @@
         <ComboBox fx:id="updateTypeComboBox" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
         <Label text="%ui.stock.file.label" GridPane.rowIndex="8"/>
         <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
-        <Button mnemonicParsing="false" onAction="#chooseStockTextFile" text="%ui.stock.file.button"
-                GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.rowIndex="8"
-                GridPane.valignment="CENTER"/>
         <Label text="%ui.scan.label" GridPane.rowIndex="9"/>
         <TextField fx:id="scanTextField" GridPane.columnIndex="1" GridPane.rowIndex="9" onAction="#scanAction"/>
         <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10">
