@@ -4,7 +4,7 @@
   <groupId>com.github.avdyk.stockupdater</groupId>
   <artifactId>stockupdater</artifactId>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1.0</version>
   <name>StockUpdater</name>
   <url>https://github.com/avdyk/stockupdater</url>
   <organization>
