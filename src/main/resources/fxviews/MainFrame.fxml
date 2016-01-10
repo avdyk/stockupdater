@@ -3,7 +3,7 @@
 <?language javascript?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <StackPane xmlns:fx="http://javafx.com/fxml/1" fx:id="root" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/null"
            fx:controller="com.github.avdyk.stockupdater.ui.javafx.controller.MainFrameController">
@@ -23,6 +23,19 @@
                   <KeyCodeCombination alt="UP" code="o" control="UP" meta="DOWN" shift="DOWN" shortcut="UP"/>
                 </accelerator>
               </MenuItem>
+              <Menu mnemonicParsing="true" text="%ui.menu.file.save">
+                <items>
+                  <MenuItem fx:id="saveButton" mnemonicParsing="true" onAction="#save" text="%ui.save.button"/>
+                  <MenuItem fx:id="saveCSVButton" mnemonicParsing="true" onAction="#saveCSV"
+                            text="%ui.savecsv.button"/>
+                  <MenuItem fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="true"
+                            onAction="#saveModifiedRowsToCSV" text="%ui.savemodifiedcsv.button">
+                    <accelerator>
+                      <KeyCodeCombination alt="UP" code="s" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
+                    </accelerator>
+                  </MenuItem>
+                </items>
+              </Menu>
               <MenuItem fx:id="accountMenuItem" text="%ui.menu.file.quit" onAction="#quit">
                 <accelerator>
                   <KeyCodeCombination alt="UP" code="q" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
@@ -46,9 +59,9 @@
     <center>
       <GridPane>
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0"/>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0"/>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0"/>
+          <!--<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="75.0"/>-->
         </columnConstraints>
         <rowConstraints>
           <RowConstraints/>
@@ -88,15 +101,9 @@
         <TextField fx:id="stockFileTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8"/>
         <Label text="%ui.scan.label" GridPane.rowIndex="9"/>
         <TextField fx:id="scanTextField" GridPane.columnIndex="1" GridPane.rowIndex="9" onAction="#scanAction"/>
-        <HBox alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10">
-          <Button fx:id="saveButton" mnemonicParsing="false" onAction="#save" text="%ui.save.button"/>
-          <Button fx:id="saveCSVButton" mnemonicParsing="false" onAction="#saveCSV" text="%ui.savecsv.button"/>
-          <Button fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="false" onAction="#saveModifiedRowsToCSV"
-                  text="%ui.savemodifiedcsv.button"/>
-        </HBox>
-        <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="3"
+        <TextArea fx:id="logOutput" editable="false" prefHeight="150.0" GridPane.columnIndex="0" GridPane.columnSpan="2"
                   GridPane.rowIndex="11" GridPane.rowSpan="5"/>
-        <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="2" GridPane.halignment="CENTER"
+        <Button onAction="#clear" text="%ui.clear.button" GridPane.columnIndex="1" GridPane.halignment="RIGHT"
                 GridPane.rowIndex="16" GridPane.valignment="CENTER"/>
         <Label fx:id="serviceLogLabel" GridPane.rowIndex="17"/>
         <ProgressBar fx:id="serviceProgress" GridPane.rowIndex="17" GridPane.columnIndex="1"/>

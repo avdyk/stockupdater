@@ -86,11 +86,11 @@ public class MainFrameController implements Initializable {
   @FXML
   private MenuItem executeInventoryMenuItem;
   @FXML
-  private Button saveButton;
+  private MenuItem saveButton;
   @FXML
-  private Button saveCSVButton;
+  private MenuItem saveCSVButton;
   @FXML
-  private Button saveModifiedRowsToCSVButton;
+  private MenuItem saveModifiedRowsToCSVButton;
   @FXML
   private Label serviceLogLabel;
   @FXML
