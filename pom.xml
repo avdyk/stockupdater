@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.avdyk.stockupdater</groupId>
   <artifactId>stockupdater</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <name>StockUpdater</name>
   <url>https://github.com/avdyk/stockupdater</url>
   <organization>
@@ -144,52 +143,44 @@
               <target xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
                 <!--definition d'une tâche pour pouvoir utiliser les commandes ant qui se trouvent dans le ant-javafx.jar du JDK-->
-                <taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant"
-                         classpath=".:${javafx.lib.ant-javafx.jar}"/>
+                <taskdef resource="com/sun/javafx/tools/ant/antlib.xml" uri="javafx:com.sun.javafx.tools.ant" classpath=".:${javafx.lib.ant-javafx.jar}" />
                 <!--definition de l'application-->
-                <fx:application id="app" name="${project.name}" mainClass="${mainJavaFXClass}"/>
+                <fx:application id="app" name="${project.name}" mainClass="${mainJavaFXClass}" />
 
                 <!--définition du classpath-->
                 <fx:resources id="appRes">
-                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar"/>
-                  <fileset dir="${project.build.directory}" includes="lib/*.jar"
-                           excludes="lib/aspectj*.jar,surfire/*.jar"/>
-                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.icns"/>
+                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar" />
+                  <fileset dir="${project.build.directory}" includes="lib/*.jar" excludes="lib/aspectj*.jar,surfire/*.jar" />
+                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.icns" />
                 </fx:resources>
                 <!--creation du jar principal-->
                 <fx:jar destfile="${project.build.directory}/${project.build.finalName}.jar">
                   <!-- application à lancer -->
-                  <application refid="app"/>
+                  <application refid="app" />
                   <!-- classpath à utiliser -->
-                  <resources refid="appRes"/>
+                  <resources refid="appRes" />
                   <!--entrées du fichier manifest-->
                   <manifest>
-                    <attribute name="Implementation-Vendor" value="${project.organization.name}"/>
-                    <attribute name="Implementation-Title" value="${project.name}"/>
-                    <attribute name="Implementation-Version" value="${project.version}"/>
-                    <attribute name="permissions" value="all-permissions"/>
-                    <attribute name="codebase" value="*"/>
+                    <attribute name="Implementation-Vendor" value="${project.organization.name}" />
+                    <attribute name="Implementation-Title" value="${project.name}" />
+                    <attribute name="Implementation-Version" value="${project.version}" />
+                    <attribute name="permissions" value="all-permissions" />
+                    <attribute name="codebase" value="*" />
                   </manifest>
                   <!-- classes qu'on doit mettre dans le jar -->
-                  <fileset dir="${project.build.directory}/classes"/>
+                  <fileset dir="${project.build.directory}/classes" />
                 </fx:jar>
                 <fx:resources id="other">
-                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar"/>
-                  <fileset dir="${project.build.directory}" includes="lib/*.jar"
-                           excludes="lib/aspectj*.jar,surfire/*.jar,lib/bcprov*.jar"/>
+                  <fileset dir="${project.build.directory}" includes="${project.build.finalName}.jar" />
+                  <fileset dir="${project.build.directory}" includes="lib/*.jar" excludes="lib/aspectj*.jar,surfire/*.jar,lib/bcprov*.jar" />
                 </fx:resources>
 
                 <!--creation du fichier JNLP et de la page html pour la version embedded-->
-                <fx:deploy width="${app.width}" height="${app.height}"
-                           nativeBundles="all"
-                           outdir="${project.build.directory}" outfile="${project.name}"
-                           verbose="true"
-                    >
-                  <application refId="app"/>
+                <fx:deploy width="${app.width}" height="${app.height}" nativeBundles="all" outdir="${project.build.directory}" outfile="${project.name}" verbose="true">
+                  <application refId="app" />
 
-                  <resources refid="other"/>
-                  <fx:info title="${project.name}" vendor="${project.organization.name}"
-                           description="${project.description}"/>
+                  <resources refid="other" />
+                  <fx:info title="${project.name}" vendor="${project.organization.name}" description="${project.description}" />
                 </fx:deploy>
               </target>
 
@@ -209,6 +200,7 @@
     </resources>
   </build>
   <scm>
-    <developerConnection>scm:git:ssh://git@github.com:avdyk/stockupdater.git</developerConnection>
+    <developerConnection>scm:git:ssh://git@github.com/avdyk/stockupdater.git</developerConnection>
+    <tag>HEAD</tag>
   </scm>
 </project>
