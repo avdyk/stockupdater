@@ -38,7 +38,7 @@ public class MainPresentationModel {
               Bindings.or(updateType.isEqualTo(UpdateType.ADD), updateType.isEqualTo(UpdateType.SUBSTRACT)),
               Bindings.and(out.isNotEmpty(), stockFile.isNotEmpty()).and(stockColumn.isNotEmpty()))
       ));
-  private BooleanProperty computed = new SimpleBooleanProperty();
+  private BooleanProperty inventoryExecuted = new SimpleBooleanProperty();
   private StringProperty logOutput = new SimpleStringProperty();
 
   public String getExcelFileIn() {
@@ -231,15 +231,15 @@ public class MainPresentationModel {
     return computable;
   }
 
-  public boolean getComputed() {
-    return computed.get();
+  public boolean isInventoryExecuted() {
+    return inventoryExecuted.get();
   }
 
-  public void setComputed(boolean computed) {
-    this.computed.set(computed);
+  public void setInventoryExecuted(boolean inventoryExecuted) {
+    this.inventoryExecuted.set(inventoryExecuted);
   }
 
-  public BooleanProperty computedProperty() {
-    return computed;
+  public BooleanProperty inventoryExecutedProperty() {
+    return inventoryExecuted;
   }
 }

@@ -62,15 +62,6 @@ public class MainFrameController implements Initializable {
   @FXML
   private StackPane root;
   @FXML
-  private MenuBar menuBar;
-  @FXML
-  private MenuItem fullScreenMenuItem;
-  @FXML
-  private MenuItem musicPlayerMenuItem;
-  @FXML
-  private MenuItem accountMenuItem;
-
-  @FXML
   private TextField excelFileInTextField;
   @FXML
   private ComboBox<String> inSheetComboBox;
@@ -172,9 +163,9 @@ public class MainFrameController implements Initializable {
     // bindings to button executeInventory enable
     executeInventoryMenuItem.disableProperty().bind(Bindings.not(mainPresentationModel.computableProperty()));
     // bindings to button save
-    saveButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
-    saveCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
-    saveModifiedRowsToCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.computedProperty()));
+    saveButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
+    saveCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
+    saveModifiedRowsToCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
 
     // request focus on the scan textfield
     Platform.runLater(scanTextField::requestFocus);
@@ -203,7 +194,7 @@ public class MainFrameController implements Initializable {
             mainPresentationModel
                 .setExcelFileInSheetNames(
                     FXCollections.observableArrayList(stockService.getInService().getSheetsName()));
-            mainPresentationModel.setComputed(false);
+            mainPresentationModel.setInventoryExecuted(false);
           } catch (IOException e) {
             LOG.warn("File not found", e);
           }
@@ -230,6 +221,7 @@ public class MainFrameController implements Initializable {
           stockComputed =
               stockCompute.stockStream(Files.lines(Paths.get(path)));
           mainPresentationModel.setStockFile(path);
+          mainPresentationModel.setInventoryExecuted(false);
           if (LOG.isDebugEnabled()) {
             LOG.debug("Résultat du stock");
             for (final Long barCode : stockComputed.keySet()) {
@@ -334,6 +326,7 @@ public class MainFrameController implements Initializable {
       protected Void call() throws Exception {
         try {
           stockService.call();
+          mainPresentationModel.setInventoryExecuted(true);
         } catch (Exception e) {
           LOG.error("Problem updating stock!", e);
         }
