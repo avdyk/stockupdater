@@ -11,15 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /**
@@ -41,6 +33,7 @@ public class ArticleServiceImpl implements ArticleService {
   List<String> columnNames = Collections.emptyList();
   String selectedColumn;
   Map<Long, Set<Integer>> INDEXES = new HashMap<>();
+  boolean indexed = false;
   String selectedLabelColumn;
 
   @Autowired
@@ -48,6 +41,11 @@ public class ArticleServiceImpl implements ArticleService {
 
   public ArticleServiceImpl() {
     super();
+  }
+
+  @Override
+  public XSSFWorkbook getWorkbook() {
+    return workbook;
   }
 
   @Override
@@ -65,11 +63,6 @@ public class ArticleServiceImpl implements ArticleService {
   }
 
   @Override
-  public XSSFWorkbook getWorkbook() {
-    return workbook;
-  }
-
-  @Override
   public List<String> getSheetsName() {
     return sheetNames;
   }
@@ -81,6 +74,11 @@ public class ArticleServiceImpl implements ArticleService {
       inNames.add(wb.getSheetName(i));
     }
     return Collections.unmodifiableList(inNames);
+  }
+
+  @Override
+  public String getSelectedSheetName() {
+    return selectedSheetName;
   }
 
   @Override
@@ -97,11 +95,6 @@ public class ArticleServiceImpl implements ArticleService {
       throw new IllegalArgumentException(String.format("Sheet '%s' not found", selectedSheetName));
     }
     this.setSelectedColumn(null);
-  }
-
-  @Override
-  public String getSelectedSheetName() {
-    return selectedSheetName;
   }
 
   @Override
@@ -132,6 +125,23 @@ public class ArticleServiceImpl implements ArticleService {
       throw new IllegalArgumentException(String.format("Column %s not found", columnName));
     }
     this.selectedColumn = columnName;
+    indexed = false;
+  }
+
+  @Override
+  public String getSelectedColumnName() {
+    return selectedColumn;
+  }
+
+  @Override
+  public Map<Long, Set<Integer>> getIdsWithLineNumbersIndexes() {
+    if (!indexed) {
+      computeIndex();
+    }
+    return Collections.unmodifiableMap(INDEXES);
+  }
+
+  private void computeIndex() {
     // prepare index
     INDEXES.clear();
     final Iterator<Row> rowIterator = this.selectedSheet.rowIterator();
@@ -161,16 +171,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
       }
     }
-  }
-
-  @Override
-  public String getSelectedColumnName() {
-    return selectedColumn;
-  }
-
-  @Override
-  public Map<Long, Set<Integer>> getIdsWithLineNumbersIndexes() {
-    return Collections.unmodifiableMap(INDEXES);
+    indexed = true;
   }
 
   @Override
@@ -202,12 +203,12 @@ public class ArticleServiceImpl implements ArticleService {
   }
 
   @Override
-  public void setSelectedLabelColumn(final String newValue) {
-    this.selectedLabelColumn = newValue;
+  public String getSelectedLabelColumn() {
+    return this.selectedLabelColumn;
   }
 
   @Override
-  public String getSelectedLabelColumn() {
-    return this.selectedLabelColumn;
+  public void setSelectedLabelColumn(final String newValue) {
+    this.selectedLabelColumn = newValue;
   }
 }
