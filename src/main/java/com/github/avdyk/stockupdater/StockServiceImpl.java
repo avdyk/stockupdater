@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.time.LocalDateTime.now;
 
@@ -161,39 +163,38 @@ public class StockServiceImpl implements StockService {
   }
 
   private String rowToString(final Row row) {
-    final Iterator<Cell> cellIterator = row.cellIterator();
-    final StringBuilder s = new StringBuilder();
-    while (cellIterator.hasNext()) {
-      final Cell cell = cellIterator.next();
-      final String value;
-      switch (cell.getCellType()) {
-        case Cell.CELL_TYPE_NUMERIC:
-          value = String.valueOf(cell.getNumericCellValue());
-          break;
-        case Cell.CELL_TYPE_STRING:
-          value = cell.getStringCellValue();
-          break;
-        case Cell.CELL_TYPE_FORMULA:
-          value = cell.getCellFormula();
-          break;
-        case Cell.CELL_TYPE_BOOLEAN:
-          value = String.valueOf(cell.getBooleanCellValue());
-          break;
-        case Cell.CELL_TYPE_ERROR:
-          value = String.format("Error #%d", cell.getErrorCellValue());
-          break;
-        case Cell.CELL_TYPE_BLANK:
-        default:
-          value = "";
-          break;
-      }
-      s.append(value)
-          .append(';');
+    String value = IntStream.range(0, this.inService.getColumnsName().size())
+        .mapToObj(row::getCell)
+        .map(this::getCellAsString)
+        .collect(Collectors.joining(";"));
+
+    return value;
+  }
+
+  private String getCellAsString(final Cell cell) {
+    final String value;
+    switch (cell.getCellType()) {
+      case Cell.CELL_TYPE_NUMERIC:
+        value = String.valueOf(cell.getNumericCellValue());
+        break;
+      case Cell.CELL_TYPE_STRING:
+        value = cell.getStringCellValue();
+        break;
+      case Cell.CELL_TYPE_FORMULA:
+        value = cell.getCellFormula();
+        break;
+      case Cell.CELL_TYPE_BOOLEAN:
+        value = String.valueOf(cell.getBooleanCellValue());
+        break;
+      case Cell.CELL_TYPE_ERROR:
+        value = String.format("Error #%d", cell.getErrorCellValue());
+        break;
+      case Cell.CELL_TYPE_BLANK:
+      default:
+        value = "";
+        break;
     }
-    if (s.length() > 1) {
-      s.deleteCharAt(s.length() - 1);
-    }
-    return s.toString();
+    return value;
   }
 
   @Override
