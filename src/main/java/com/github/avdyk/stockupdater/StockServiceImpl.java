@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
@@ -33,7 +34,7 @@ import static java.time.LocalDateTime.now;
 @Service
 public class StockServiceImpl implements StockService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StockServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(StockServiceImpl.class);
   private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.S");
   private static final Marker FOUND = MarkerFactory.getMarker("FOUND");
   private static final Marker NOT_FOUND = MarkerFactory.getMarker("NOT_FOUND");
@@ -85,26 +86,26 @@ public class StockServiceImpl implements StockService {
     }
     if (StringUtils.isNotBlank(this.stockService.getSelectedColumnName())) {
       final Integer stockIndex = this.stockService.getColumnsName().indexOf(this.stockService.getSelectedColumnName());
-        final XSSFSheet sheet = this.outService.getSelectedSheet();
-        rows.stream().filter(r -> r != null)
-            .forEach(row -> {
-              final XSSFRow r = sheet.getRow(row);
-              final XSSFCell cell;
-              if (outIndex != null) {
-                if (r.getCell(outIndex) != null) {
-                  cell = r.getCell(outIndex);
-                } else {
-                  cell = r.createCell(outIndex);
-                }
+      final XSSFSheet sheet = this.outService.getSelectedSheet();
+      rows.stream().filter(r -> r != null)
+          .forEach(row -> {
+            final XSSFRow r = sheet.getRow(row);
+            final XSSFCell cell;
+            if (outIndex != null) {
+              if (r.getCell(outIndex) != null) {
+                cell = r.getCell(outIndex);
               } else {
-                cell = null;
+                cell = r.createCell(outIndex);
               }
-              final double newValue = computeStock(row, stockIndex, updateType, quantity);
-              if (updateType != UpdateType.TEST && cell != null) {
-                cell.setCellValue(newValue);
-              }
-              LOG.info("Update stock for line {}: {}", row, newValue);
-            });
+            } else {
+              cell = null;
+            }
+            final double newValue = computeStock(row, stockIndex, updateType, quantity);
+            if (updateType != UpdateType.TEST && cell != null) {
+              cell.setCellValue(newValue);
+            }
+            logger.info("Update stock for line {}: {}", row, newValue);
+          });
     }
   }
 
@@ -126,7 +127,7 @@ public class StockServiceImpl implements StockService {
         newValue = quantity;
         modifiedRows.add(row);
     }
-    LOG.debug("Update value for cel({}, {}), update type: {}: old value: {}; quantity: {}; new value: {}",
+    logger.debug("Update value for cel({}, {}), update type: {}: old value: {}; quantity: {}; new value: {}",
         row, stockIndex, updateType, originalStock, quantity, newValue);
     return newValue;
   }
@@ -145,6 +146,53 @@ public class StockServiceImpl implements StockService {
   @Override
   public void writeExcelWorkbook(final OutputStream stream) throws IOException {
     this.outService.getWorkbook().write(stream);
+  }
+
+  @Override
+  public void writeExcelWorkbookModifiedRows(final OutputStream stream) throws IOException {
+    final XSSFWorkbook copy = this.outService.getWorkbook();
+    final String selectedSheetName = this.outService.getSelectedSheetName();
+    if (StringUtils.isNotEmpty(selectedSheetName)) {
+      removeUnselectedSheets(copy, selectedSheetName);
+      final XSSFSheet sheet = copy.getSheet(selectedSheetName);
+      final List<Integer> modifiedRowsCopy = new ArrayList<>(modifiedRows);
+      if (sheet != null) {
+        logger.debug("rows in sheet: {}", sheet.getPhysicalNumberOfRows());
+        final List<Integer> rowsToRemove = getRowsToRemove(modifiedRows, sheet.getFirstRowNum(),
+            sheet.getLastRowNum());
+        logger.debug("will remove {} rows", rowsToRemove.size());
+        rowsToRemove.stream()
+            .sorted(Collections.reverseOrder())
+            .map(sheet::getRow)
+            .forEach(sheet::removeRow);
+        logger.debug("rows in sheet: {}", sheet.getPhysicalNumberOfRows());
+        copy.write(stream);
+      } else {
+        logger.warn("Selected sheet is null in the copy workbook");
+      }
+    } else {
+      logger.warn("No sheet selected");
+    }
+  }
+
+  private List<Integer> getRowsToRemove(final Set<Integer> modifiedRows, final int firstRowNum, final int lastRowNum) {
+    final List<Integer> rows = IntStream.range(firstRowNum, lastRowNum)
+        .filter(r -> !modifiedRows.contains(r))
+        .mapToObj(Integer::valueOf)
+        .collect(Collectors.toList());
+
+    return rows;
+  }
+
+  private void removeUnselectedSheets(final XSSFWorkbook book, final String selectedSheetName) {
+    assert book != null;
+    assert selectedSheetName != null;
+    final int size = book.getNumberOfSheets();
+    for (int i = size - 1; i >= 0; i--) {
+      if (!selectedSheetName.equals(book.getSheetName(i))) {
+        book.removeSheetAt(i);
+      }
+    }
   }
 
   @Override
@@ -232,7 +280,7 @@ public class StockServiceImpl implements StockService {
     modifiedRows.clear();
     final String titleMsg = String.format("Updating stock at %s",
         now().format(dateFormatter));
-    LOG.info(titleMsg);
+    logger.info(titleMsg);
     // TODO try to use a log appender
     Platform.runLater(() -> mainPresentationModel.setLogOutput(titleMsg + ":\n"));
     stock.forEach((id, quantity) -> {
@@ -259,12 +307,12 @@ public class StockServiceImpl implements StockService {
             label = "NO LABEL SELECTED";
           }
           final String msg = String.format("Article found %s: %d", label, id);
-          LOG.info(FOUND, msg);
+          logger.info(FOUND, msg);
           // TODO try to use a log appender
           Platform.runLater(() -> mainPresentationModel.setLogOutput(mainPresentationModel.getLogOutput() + msg + "\n"));
         } else {
           final String msg = String.format("Article not found: %d", id);
-          LOG.warn(NOT_FOUND, msg);
+          logger.warn(NOT_FOUND, msg);
           // TODO try to use a log appender
           Platform.runLater(() -> mainPresentationModel.setLogOutput(mainPresentationModel.getLogOutput() + msg + "\n"));
         }

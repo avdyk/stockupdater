@@ -32,6 +32,8 @@ public interface StockService {
    */
   void writeExcelWorkbook(OutputStream stream) throws IOException;
 
+  void writeExcelWorkbookModifiedRows(OutputStream outStream) throws IOException;
+
   /**
    * Save the selected sheet to a CSV file. The stream will not be closed but it'll be fulshed!
    *

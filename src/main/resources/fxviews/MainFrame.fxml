@@ -26,14 +26,16 @@
               <Menu mnemonicParsing="true" text="%ui.menu.file.save">
                 <items>
                   <MenuItem fx:id="saveButton" mnemonicParsing="true" onAction="#save" text="%ui.save.button"/>
-                  <MenuItem fx:id="saveCSVButton" mnemonicParsing="true" onAction="#saveCSV"
-                            text="%ui.savecsv.button"/>
-                  <MenuItem fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="true"
-                            onAction="#saveModifiedRowsToCSV" text="%ui.savemodifiedcsv.button">
+                  <MenuItem fx:id="saveModifiedRowsButton" mnemonicParsing="true" onAction="#saveModifiedRows"
+                            text="%ui.savemodified.button">
                     <accelerator>
                       <KeyCodeCombination alt="UP" code="s" control="UP" meta="DOWN" shift="UP" shortcut="UP"/>
                     </accelerator>
                   </MenuItem>
+                  <MenuItem fx:id="saveCSVButton" mnemonicParsing="true" onAction="#saveCSV"
+                            text="%ui.savecsv.button"/>
+                  <MenuItem fx:id="saveModifiedRowsToCSVButton" mnemonicParsing="true"
+                            onAction="#saveModifiedRowsToCSV" text="%ui.savemodifiedcsv.button"/>
                 </items>
               </Menu>
               <MenuItem fx:id="accountMenuItem" text="%ui.menu.file.quit" onAction="#quit">

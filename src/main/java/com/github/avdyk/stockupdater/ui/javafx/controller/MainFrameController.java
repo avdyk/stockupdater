@@ -88,6 +88,8 @@ public class MainFrameController implements Initializable {
   @FXML
   private MenuItem saveButton;
   @FXML
+  private MenuItem saveModifiedRowsButton;
+  @FXML
   private MenuItem saveCSVButton;
   @FXML
   private MenuItem saveModifiedRowsToCSVButton;
@@ -164,6 +166,7 @@ public class MainFrameController implements Initializable {
     executeInventoryMenuItem.disableProperty().bind(Bindings.not(mainPresentationModel.computableProperty()));
     // bindings to button save
     saveButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
+    saveModifiedRowsButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
     saveCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
     saveModifiedRowsToCSVButton.disableProperty().bind(Bindings.not(mainPresentationModel.inventoryExecutedProperty()));
 
@@ -346,6 +349,24 @@ public class MainFrameController implements Initializable {
     try (OutputStream outStream = Files.newOutputStream(
         Paths.get(outputFilename), StandardOpenOption.WRITE)) {
       stockService.writeExcelWorkbook(outStream);
+      outStream.flush();
+      LOG.info("File {} has been saved", outputFilename);
+    } catch (IOException e) {
+      LOG.error("Problem writing file {}", outputFilename, e);
+    }
+    // request focus on the scan textfield
+    Platform.runLater(scanTextField::requestFocus);
+  }
+
+  @FXML
+  @SuppressWarnings("unused")
+    // called by fxml
+  void saveModifiedRows(final ActionEvent actionEvent) {
+    final String outputFilename = getOutputFilename("-new-stock.xlsx");
+    LOG.info("save in file: {}", outputFilename);
+    try (OutputStream outStream = Files.newOutputStream(
+        Paths.get(outputFilename), StandardOpenOption.WRITE)) {
+      stockService.writeExcelWorkbookModifiedRows(outStream);
       outStream.flush();
       LOG.info("File {} has been saved", outputFilename);
     } catch (IOException e) {
