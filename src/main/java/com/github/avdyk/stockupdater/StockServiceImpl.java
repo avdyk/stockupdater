@@ -83,53 +83,63 @@ public class StockServiceImpl implements StockService {
     } else {
       outIndex = null;
     }
-    final Integer stockIndex;
     if (StringUtils.isNotBlank(this.stockService.getSelectedColumnName())) {
-      stockIndex = this.stockService.getColumnsName().indexOf(this.stockService.getSelectedColumnName());
-    } else {
-      stockIndex = null;
+      final Integer stockIndex = this.stockService.getColumnsName().indexOf(this.stockService.getSelectedColumnName());
+        final XSSFSheet sheet = this.outService.getSelectedSheet();
+        rows.stream().filter(r -> r != null)
+            .forEach(row -> {
+              final XSSFRow r = sheet.getRow(row);
+              final XSSFCell cell;
+              if (outIndex != null) {
+                if (r.getCell(outIndex) != null) {
+                  cell = r.getCell(outIndex);
+                } else {
+                  cell = r.createCell(outIndex);
+                }
+              } else {
+                cell = null;
+              }
+              final double newValue = computeStock(row, stockIndex, updateType, quantity);
+              if (updateType != UpdateType.TEST && cell != null) {
+                cell.setCellValue(newValue);
+              }
+              LOG.info("Update stock for line {}: {}", row, newValue);
+            });
     }
-    rows.stream().filter(r -> r != null)
-        .forEach(row -> {
-          final long originalStock;
-          if (stockIndex != null) {
-            originalStock = excelUtilService.getLongValueFromCell(
-                this.inService.getSelectedSheet().getRow(row).getCell(stockIndex));
-          } else {
-            originalStock = 0;
-          }
-          final XSSFRow r = this.outService.getSelectedSheet().getRow(row);
-          final XSSFCell cell;
-          if (outIndex != null) {
-            if (r.getCell(outIndex) != null) {
-              cell = r.getCell(outIndex);
-            } else {
-              cell = r.createCell(outIndex);
-            }
-          } else {
-            cell = null;
-          }
-          final double newValue;
-          switch (updateType) {
-            case ADD:
-              newValue = originalStock + quantity;
-              modifiedRows.add(row);
-              break;
-            case SUBSTRACT:
-              newValue = originalStock - quantity;
-              modifiedRows.add(row);
-              break;
-            case TEST:
-            case UPDATE:
-            default:
-              newValue = quantity;
-              modifiedRows.add(row);
-          }
-          if (updateType != UpdateType.TEST && cell != null) {
-            cell.setCellValue(newValue);
-          }
-          LOG.info("Update stock for line {}: from {} to {}", row, originalStock, newValue);
-        });
+  }
+
+  private double computeStock(final Integer row, final Integer stockIndex, final UpdateType updateType, final long quantity) {
+    final long originalStock = getOriginalStock(row, stockIndex);
+    final double newValue;
+    switch (updateType) {
+      case ADD:
+        newValue = originalStock + quantity;
+        modifiedRows.add(row);
+        break;
+      case SUBSTRACT:
+        newValue = originalStock - quantity;
+        modifiedRows.add(row);
+        break;
+      case TEST:
+      case UPDATE:
+      default:
+        newValue = quantity;
+        modifiedRows.add(row);
+    }
+    LOG.debug("Update value for cel({}, {}), update type: {}: old value: {}; quantity: {}; new value: {}",
+        row, stockIndex, updateType, originalStock, quantity, newValue);
+    return newValue;
+  }
+
+  private long getOriginalStock(final Integer row, final Integer stockIndex) {
+    final long originalStock;
+    if (row != null && stockIndex != null) {
+      originalStock = excelUtilService.getLongValueFromCell(
+          this.inService.getSelectedSheet().getRow(row).getCell(stockIndex));
+    } else {
+      originalStock = 0;
+    }
+    return originalStock;
   }
 
   @Override
